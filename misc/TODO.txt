@@ -1,0 +1,11 @@
+//DONE: 基本数据结构构建
+//TODO: 数据集（良）
+//TODO: 图片转向量库函数研究
+//TODO: 衔接，索引
+//TODO: Init
+//TODO: Insert
+//TODO: Search
+//TODO: Destroy
+//XXX: 性能评估
+//TODO: 批处理循环
+//TODO: 实验报告Doc
