@@ -1,9 +1,9 @@
 typedef int NodeDataType;
 typedef struct Node
 {
-    NodeDataType data;   // 数据域
-    struct Node **pList; // 同层m临近数组
-    Node *nextLevel;     // 下一层
+    NodeDataType data;      // 数据域
+    struct Node **pList;    // 同层m临近数组
+    struct Node *nextLevel; // 下一层
 } Node;
 
 typedef struct HNSW_Graph

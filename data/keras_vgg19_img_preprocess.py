@@ -10,7 +10,7 @@ model = VGG19(weights="imagenet", include_top=False)
 
 
 def extract_features(img_path):
-    # 加载图像，调整大小为224x224（VGG16的输入大小）
+    # 加载图像，调整大小为224x224（VGG19的输入大小）
     img = image.load_img(img_path, target_size=(224, 224))
     # 将图像转换为NumPy数组
     x = image.img_to_array(img)
@@ -25,25 +25,15 @@ def extract_features(img_path):
 
 
 # 提取两个图像的特征
-L = []
 for file in sorted(os.listdir(file_path)):
     if file.endswith(".jpg"):
         img_path = os.path.join(file_path, file)
         features = extract_features(img_path)
-        print(file)
-        print(features)
-        L.append(features)
-
-# 计算特征向量之间的欧几里得距离
-for i in range(len(L)):
-    for j in range(i + 1, len(L)):
-        distance = np.linalg.norm(L[i] - L[j])
-        print(i, j, "D_E_ij =", int(distance))
-# 计算特征向量之间的余弦相似度
-for i in range(len(L)):
-    for j in range(i + 1, len(L)):
-        similarity = np.dot(L[i], L[j]) / (np.linalg.norm(L[i]) * np.linalg.norm(L[j]))
-        print(i, j, "C_S_ij =", similarity)
+        print(len(features))
+        index = file[:-4]
+        with open("./preprocess/" + index + ".txt", "w") as f:
+            f.write(" ".join(str(x) for x in features))
+            f.close()
 
 
 # TODO: 是否需要建立文件表来查找距离，而不是计算输出（性能考虑）
