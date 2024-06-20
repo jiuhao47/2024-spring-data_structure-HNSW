@@ -37,7 +37,5 @@ for i in range(len(L)):
 
 for i in range(len(L)):
     for j in range(i + 1, len(L)):
-        print(
-            i, j, "D_Cos_ij =", (1 - distance_cosine(L[i], L[j]) - 0.99999) * 10000000
-        )
+        print(i, j, "D_Cos_ij =", distance_cosine(L[i], L[j]))
 # TODO: 距离函数仍需考虑
