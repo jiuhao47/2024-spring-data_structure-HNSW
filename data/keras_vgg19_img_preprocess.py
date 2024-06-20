@@ -4,7 +4,19 @@ from keras._tf_keras.keras.applications.vgg19 import VGG19, preprocess_input
 import numpy as np
 import os
 
-file_path = "./input"
+"""
+source_directory = [
+    "flower",
+    "logo",
+    "aircraft",
+    "food",
+    "clothing",
+]
+"""
+source_directory = [
+    "clothing",
+]
+file_path = "./input/"
 # 加载预训练的VGG19模型，不包括顶部的全连接层
 model = VGG19(weights="imagenet", include_top=False)
 
@@ -25,17 +37,15 @@ def extract_features(img_path):
 
 
 # 提取两个图像的特征
-for file in sorted(os.listdir(file_path)):
-    if file.endswith(".jpg"):
-        img_path = os.path.join(file_path, file)
-        features = extract_features(img_path)
-        print(len(features))
-        index = file[:-4]
-        with open("./preprocess/" + index + ".txt", "w") as f:
-            f.write(" ".join(str(x) for x in features))
-            f.close()
-
-
-# TODO: 是否需要建立文件表来查找距离，而不是计算输出（性能考虑）
-# TODO: C调用python函数与C单独实现的性能考虑
-# TODO: 命令行前端接口，调试接口，批处理脚本，大类评测，小类评测，数据处理接口，距离函数
+for name in source_directory:
+    directory = file_path + name
+    os.makedirs("./preprocess/" + name, exist_ok=True)
+    for file in sorted(os.listdir(directory)):
+        if file.endswith(".jpg"):
+            img_path = os.path.join(directory, file)
+            features = extract_features(img_path)
+            index = file[:-4]
+            print(index)
+            with open("./preprocess/" + name + "/" + index + ".txt", "w") as f:
+                f.write(" ".join(str(x) for x in features))
+                f.close()

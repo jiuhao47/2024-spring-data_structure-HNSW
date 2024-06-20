@@ -38,4 +38,3 @@ for i in range(len(L)):
 for i in range(len(L)):
     for j in range(i + 1, len(L)):
         print(i, j, "D_Cos_ij =", distance_cosine(L[i], L[j]))
-# TODO: 距离函数仍需考虑
