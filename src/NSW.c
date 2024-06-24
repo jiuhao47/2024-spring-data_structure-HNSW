@@ -1,5 +1,5 @@
-//初始化了吗
-//越界了吗
+// 初始化了吗
+// 越界了吗
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -77,8 +77,8 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
 
 // 连接新节点与第level层的m-邻近节点
 void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
-{   
-    //第一步，将入口点及其相连节点存入候选节点数组
+{
+    // 第一步，将入口点及其相连节点存入候选节点数组
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
     InsertVisitedPointList(SL, p);       // 将第一个候选节点存入访问过节点数组
     for (int i = 0; i < MAX_NEAR && p->pList[i] != NULL; i++)
@@ -99,31 +99,32 @@ void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
     {
         SL->candidatePointList2[i] = SL->candidatePointList[i];
     }
-    //接下来一直循环，直到找到m-邻近节点
-    while(1){
-        //从（影子的）第一个候选节点开始搜索m-邻近节点，并存入候选节点数组
-        for(int i = 0; i <= MAX_NEAR && SL->candidatePointList2[i] != NULL; i++)
+    // 接下来一直循环，直到找到m-邻近节点
+    while (1)
+    {
+        // 从（影子的）第一个候选节点开始搜索m-邻近节点，并存入候选节点数组
+        for (int i = 0; i <= MAX_NEAR && SL->candidatePointList2[i] != NULL; i++)
         {
-            for(int j = 0; j < MAX_NEAR && SL->candidatePointList2[i]->pList[j] != NULL; j++)
+            for (int j = 0; j < MAX_NEAR && SL->candidatePointList2[i]->pList[j] != NULL; j++)
             {
                 InsertCandidatePointList(SL, SL->candidatePointList2[i]->pList[j], newNode);
             }
         }
         // 判断候选节点数组和影子数组（至少）前MAX_NEAR项是否相同，若不相同则更新影子数组，若相同则找到m-邻近节点,进行连接
-        for(int i = 0; i < MAX_NEAR && SL->candidatePointList[i] != NULL; i++)
+        for (int i = 0; i < MAX_NEAR && SL->candidatePointList[i] != NULL; i++)
         {
-            if(SL->candidatePointList[i] != SL->candidatePointList2[i])
+            if (SL->candidatePointList[i] != SL->candidatePointList2[i])
             {
-                for(int j = i; j < SL->candidatePointCount; j++)
+                for (int j = i; j < SL->candidatePointCount; j++)
                 {
                     SL->candidatePointList2[j] = SL->candidatePointList[j];
                 }
                 break;
             }
-            if(i == MAX_NEAR - 1)
+            if (i == MAX_NEAR - 1)
             {
-                //连接
-                for(int j = 0; j < MAX_NEAR; j++)
+                // 连接
+                for (int j = 0; j < MAX_NEAR; j++)
                 {
                     newNode->pList[j] = SL->candidatePointList[j];
                     //!!!
@@ -166,12 +167,11 @@ void InsertVisitedPointList(SearchList *SL, Node *node)
     SL->visitedPointList[SL->visitedPointCount++] = node;
 }
 
-
-//将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
+// 将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
 void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode)
-{   
-    //查询节点是否已经在候选节点数组中
-    for(int i = 0; i < SL->visitedPointCount; i++)
+{
+    // 查询节点是否已经在候选节点数组中
+    for (int i = 0; i < SL->visitedPointCount; i++)
     {
         if (SL->visitedPointList[i] == node)
         {
@@ -179,7 +179,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode)
         }
     }
     node->distance = Distance(newNode, node);
-    //二分查找，插入候选节点数组，后面元素后移
+    // 二分查找，插入候选节点数组，后面元素后移
     int left = 0;
     int right = SL->candidatePointCount - 1;
     int mid;
