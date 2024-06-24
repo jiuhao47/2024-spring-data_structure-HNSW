@@ -1,5 +1,6 @@
 #define MAX_LAYER 10    // Max Layer （从第0层到第9层）
 #define MAX_POINT 111   // Max Point Sum
+#define SEARCH_NUM 5    // Search Num
 #define RANDOMWeight 1  // mL
 #define MAX_NEAR 10     // m-near
 #define FILEPATHLEN 100 // filename length

@@ -4,6 +4,7 @@ typedef struct Node
     float distance;         // 距离
     NodeDataType data;      // 数据域
     struct Node **pList;    // 同层m临近数组
+    int connectCount;       // 点连接数
     struct Node *nextLevel; // 下一层
 } Node;
 
@@ -24,8 +25,8 @@ typedef struct SearchList
 } SearchList;
 void InitalGraph(HNSW_Graph **G);
 Node *InsertNode(HNSW_Graph *G, NodeDataType data);
-void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL);
-Node *Search(HNSW_Graph *G);
+void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL);
+Node *Search(HNSW_Graph *G, NodeDataType data);
 int RandomLevel();
 float CosineDistance(float *a, float *b, int size);
 void ReadVectorFromFile(char *filename, float *vector, int size);
