@@ -16,7 +16,7 @@ source_directory = [
 source_directory = [
     "clothing",
 ]
-file_path = "./input/"
+file_path = "./img_input/"
 # 加载预训练的VGG19模型，不包括顶部的全连接层
 model = VGG19(weights="imagenet", include_top=False)
 

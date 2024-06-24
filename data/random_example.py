@@ -23,7 +23,7 @@ source_directory = [
 ]
 root_directory = "/home/jiuhao/Workspace/Downloads/dataset/"
 
-target_directory = "./input/"
+target_directory = "./img_input/"
 for name in source_directory:
     directory = root_directory + name
     target = target_directory + name
