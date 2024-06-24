@@ -1,6 +1,3 @@
-// 初始化了吗
-// 越界了吗
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -27,6 +24,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
     Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
     newNode->data = data;                                        // 赋值
     newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
+    newNode->connectCount = 0;                                   // 连接数为0
     if (level > G->highestLevel)                                 // 每一层的第一个节点都作为入口点
     {
         G->highestLevel = level;
@@ -39,6 +37,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
     SL->candidatePointList2 = calloc(MAX_POINT, sizeof(Node *));                   // 候选节点数组的影子数组 定长
     SL->visitedPointList = calloc(1, sizeof(Node *));                              // 访问过节点数组 变长 当空间不足时长度加倍
     SL->visitedPointCount = 0;                                                     // 访问过节点数
+    SL->candidatePointCount = 0;                                                   // 候选节点数
     SL->candidatePointList[SL->candidatePointCount++] = G->pEntryPointList[level]; // 第一个候选节点为入口点
 
     // 每一层插入节点
@@ -67,8 +66,19 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
         {
             newNode->nextLevel = NULL;
         }
-        // 每一层要连接m-邻近节点，上面先维护更新SL的成员，再调用ConnectNode函数
-        ConnectNode(G, newNode, i, SL);
+        // 每一层要连接m-邻近节点，上面先维护更新SL的成员，再调用FindNode函数
+        FindNode(G, newNode, i, SL);
+        // 连接
+        for (int j = 0; j < MAX_NEAR && SL->candidatePointList[j] != NULL; j++)
+        {
+            newNode->pList[newNode->connectCount++] = SL->candidatePointList[j];
+            // 候选点的初始分配空间为MAX_NEAR，若不足则重新分配+1空间，然后插入新节点
+            if (SL->candidatePointList[j]->connectCount == MAX_NEAR) // 初始分配空间已满
+            {
+                SL->candidatePointList[j]->pList = realloc(SL->candidatePointList[j]->pList, sizeof(Node *) * (MAX_NEAR + 1));
+            }
+            SL->candidatePointList[j]->pList[SL->candidatePointList[j]->connectCount++] = newNode;
+        }
         // 注意第0层连接NULL
         lastNode = newNode;
     }
@@ -76,7 +86,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
 }
 
 // 连接新节点与第level层的m-邻近节点
-void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
+void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
 {
     // 第一步，将入口点及其相连节点存入候选节点数组
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
@@ -123,13 +133,6 @@ void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
             }
             if (i == MAX_NEAR - 1)
             {
-                // 连接
-                for (int j = 0; j < MAX_NEAR; j++)
-                {
-                    newNode->pList[j] = SL->candidatePointList[j];
-                    //!!!
-                    SL->candidatePointList[j]->pList[j] = newNode;
-                }
                 return;
             }
         }
@@ -216,9 +219,48 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode)
 }
 
 // 搜索m-邻近节点
-Node *Search(HNSW_Graph *G)
+Node **Search(HNSW_Graph *G, NodeDataType data)
 {
-    // critical and hard!
+    // 初始化待搜索节点
+    Node *SearchNode = (Node *)malloc(sizeof(Node));
+    SearchNode->data = data;
+    Node *p = G->pEntryPointList[G->highestLevel]; // 从最高层开始搜索
+
+    // 初始化搜索列表
+    SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
+    SL->candidatePointList = calloc(MAX_POINT, sizeof(Node *));  // 候选节点数组 定长
+    SL->candidatePointList2 = calloc(MAX_POINT, sizeof(Node *)); // 候选节点数组的影子数组 定长
+    SL->visitedPointList = calloc(1, sizeof(Node *));            // 访问过节点数组 变长 当空间不足时长度加倍
+    SL->visitedPointCount = 0;                                   // 访问过节点数
+    SL->candidatePointCount = 0;                                 // 候选节点数
+    SL->candidatePointList[SL->candidatePointCount++] = p;       // 第一个候选节点为入口点
+
+    // 在每一层进行搜索，进入下一层时将上一层的最近节点作为新的入口
+    for (int i = G->highestLevel; i >= 0; i--)
+    {
+        if (i != G->highestLevel)
+        {
+            p = p->nextLevel;
+            for (int j = 0; j < MAX_POINT; j++)
+            {
+                SL->candidatePointList[j] = NULL;
+                SL->candidatePointList2[j] = NULL;
+            }
+            SL->candidatePointList[0] = p;
+            free(SL->visitedPointList);
+            SL->visitedPointList = calloc(1, sizeof(Node *));
+        }
+        FindNode(G, SearchNode, i, SL);
+        p = SL->candidatePointList[0];
+        if (i == 0)
+        {
+            Node **result = (Node **)malloc(sizeof(Node *) * SEARCH_NUM);
+            for (int j = 0; j < SEARCH_NUM && SEARCH_NUM <= SL->candidatePointCount; j++)
+            {
+                result[j] = SL->candidatePointList[j];
+            }
+        }
+    }
 }
 
 // 随机插入层数
