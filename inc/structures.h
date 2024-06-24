@@ -18,7 +18,8 @@ typedef struct HNSW_Graph
 typedef struct SearchList
 {
     Node **visitedPointList;   // 访问过节点数组 变长
-    Node **candidatePointList; // 候选节点数组 长度为2 * MAX_NEAR
-    Node **candidatePointList2; // 候选节点数组的影子数组
     int visitedPointCount;     // 访问过节点数
+    Node **candidatePointList; // 候选节点数组 长度为 MAX_NEAR * MAX_NEAR + MAX_NEAR + 1
+    Node **candidatePointList2; // 候选节点数组的影子数组
+    int candidatePointCount;    // 候选节点数
 } SearchList;
