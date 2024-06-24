@@ -77,14 +77,8 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
 
 // 连接新节点与第level层的m-邻近节点
 void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
-<<<<<<< HEAD
 {   
     //第一步，将入口点及其相连节点存入候选节点数组
-=======
-{
-    // 第一步，将入口点及其相连节点存入候选节点数组
-    int sum;                             // 记录当前待比较的节点数目
->>>>>>> e9a01c468b5e6876f355d5ee995b33d545065dbc
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
     InsertVisitedPointList(SL, p);       // 将第一个候选节点存入访问过节点数组
     for (int i = 0; i < MAX_NEAR && p->pList[i] != NULL; i++)
@@ -172,32 +166,20 @@ void InsertVisitedPointList(SearchList *SL, Node *node)
     SL->visitedPointList[SL->visitedPointCount++] = node;
 }
 
-<<<<<<< HEAD
 
 //将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
 void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode)
 {   
     //查询节点是否已经在候选节点数组中
     for(int i = 0; i < SL->visitedPointCount; i++)
-=======
-// 将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
-void InsertCandidatePointList(SearchList *SL, Node *node)
-{
-    // 查询节点是否已经在候选节点数组中
-    for (int i = 0; i < SL->visitedPointCount; i++)
->>>>>>> e9a01c468b5e6876f355d5ee995b33d545065dbc
     {
         if (SL->visitedPointList[i] == node)
         {
             return;
         }
     }
-<<<<<<< HEAD
     node->distance = Distance(newNode, node);
     //二分查找，插入候选节点数组，后面元素后移
-=======
-    // 二分查找，插入候选节点数组，后面元素后移
->>>>>>> e9a01c468b5e6876f355d5ee995b33d545065dbc
     int left = 0;
     int right = SL->candidatePointCount - 1;
     int mid;
@@ -234,7 +216,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node)
 }
 
 // 搜索m-邻近节点
-void Search(HNSW_Graph *G)
+Node *Search(HNSW_Graph *G)
 {
     // critical and hard!
 }

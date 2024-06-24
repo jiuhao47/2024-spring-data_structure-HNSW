@@ -24,7 +24,7 @@ typedef struct SearchList
 } SearchList;
 void InitalGraph(HNSW_Graph **G);
 Node *InsertNode(HNSW_Graph *G, NodeDataType data);
-void ConnectNode(HNSW_Graph *G, Node *newNode, int level);
+void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL);
 Node *Search(HNSW_Graph *G);
 int RandomLevel();
 float CosineDistance(float *a, float *b, int size);
