@@ -30,6 +30,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
     SL->candidatePointList = calloc(2 * MAX_NEAR, sizeof(Node *)); // 候选节点数组 定长
+    SL->candidatePointList2 = calloc(2 * MAX_NEAR, sizeof(Node *)); // 候选节点数组的影子数组 定长
     SL->visitedPointList = calloc(1, sizeof(Node *)); // 访问过节点数组 变长 当空间不足时长度加倍
     SL->candidatePointList[0] = G->pEntryPointList[level]; // 第一个候选节点为入口点
     
@@ -44,10 +45,11 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
             newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR);
             lastNode->nextLevel = newNode;
             // 第一个候选节点为上一层搜索到的最近节点，其余为NULL
-            SL->candidatePointList[0] = SL->candidatePointList[0]->nextLevel;
-            for(int j = 1; j < 2 * MAX_NEAR; j++){
+            for(int j = 0; j < 2 * MAX_NEAR; j++){
                 SL->candidatePointList[j] = NULL;
+                SL->candidatePointList2[j] = NULL;
             }
+            SL->candidatePointList[0] = SL->candidatePointList[0]->nextLevel;
             // 释放上一层访问过节点数组 重新分配
             free(SL->visitedPointList);
             SL->visitedPointList = calloc(1, sizeof(Node *));
@@ -66,16 +68,56 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
 // 连接新节点与第level层的m-邻近节点
 void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
 {   
+    int sum; // 记录当前待比较的节点数目
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
     for(int i = 0; i < MAX_NEAR; i++){
-        p->pList[i] = SL->candidatePointList[i + 1]; //最终获得了i + 1个候选点
+        SL->candidatePointList[i + 1] = p->pList[i];
     }
+    // 计算当前待比较的节点数目（因为plist并不一定有MAX_NEAR个节点，若图在本层的总节点数过少）
+    // 同时完成对距离的计算
+    for(sum = 0; sum < 2 * MAX_NEAR && SL->candidatePointList[sum] != NULL; sum++)
+        SL->candidatePointList[sum]->distance = Distance(newNode, SL->candidatePointList[sum]);
+    // 对候选节点进行排序
 
-    //在第level层搜索m-邻近节点并进行连接
 
 
-    //在第i层搜索m-邻近节点并进行连接
+
+
+
+
+
+
+
+
+
+
+
+    // 对候选节点进行排序，然后与影子数组作比较，若前MAX_NEAR个节点均相同，说明已经找到了m-邻近节点，连接即可
+
+    // 若存在不同的节点，更新影子数组，然后继续搜索
+
+
+    // 在第level层搜索m-邻近节点并进行连接
+
+
+    // 在第i层搜索m-邻近节点并进行连接
 }
+
+void insertionSort(SearchList *SL, int n) {
+    // 将候选节点数组中的前n个节点按照距离从小到大排序
+    for (int i = 1; i < n; i++) {
+        Node *temp = SL->candidatePointList[i];
+        int j = i - 1;
+        while (j >= 0 && SL->candidatePointList[j]->distance > temp->distance) {
+            SL->candidatePointList[j + 1] = SL->candidatePointList[j];
+            j--;
+        }
+        SL->candidatePointList[j + 1] = temp;
+    }
+}
+
+
+
 
 // 搜索m-邻近节点
 void Search(HNSW_Graph *G)
