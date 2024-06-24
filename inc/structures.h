@@ -13,3 +13,10 @@ typedef struct HNSW_Graph
     int nodeCount;          // 当前节点数
     // maxLevel defined
 } HNSW_Graph;
+
+typedef struct SearchList
+{
+    Node **visitedPointList;   // 访问过节点数组 变长
+    Node **candidatePointList; // 候选节点数组 长度为2 * MAX_NEAR
+    int visitedPointCount;     // 访问过节点数
+} SearchList;
