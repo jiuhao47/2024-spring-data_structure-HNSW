@@ -3,7 +3,7 @@ import numpy as np
 import os
 
 file_path = (
-    "/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/data/input"
+    "/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/data/img_input"
 )
 
 

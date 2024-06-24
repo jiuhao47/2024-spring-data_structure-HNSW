@@ -1,4 +1,3 @@
-input/
-output/
-preprocess/
-
+data/output/
+data/preprocess/
+data/imgInput/

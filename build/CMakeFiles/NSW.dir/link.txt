@@ -1,0 +1,1 @@
+/usr/bin/cc -g -rdynamic CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.o CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.o -o NSW  -lm 

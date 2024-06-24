@@ -1,7 +1,7 @@
 //DONE: 基本数据结构构建
 //DONE: 数据集（良）
-//TODO: 数据集整合与处理
-//TODO: 大类、小类单独评测集合
+//DONE: 数据集整合与处理
+//DONE: 大类、小类单独评测集合
 //DONE: 图片转向量库函数研究
 //DONE: 距离函数
 //DONE: 衔接，索引
@@ -10,7 +10,7 @@
 //TODO: Search
 //TODO: Destroy
 //XXX: 性能评估
-//XXX: 与暴力搜索对比
+//DONE: 与暴力搜索对比
 //TODO: 命令行前端Ver（支持单独导入图片）
 //TODO: 调试Ver及批处理
 //TODO: 实验报告Doc

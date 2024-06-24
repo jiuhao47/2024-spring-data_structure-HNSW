@@ -4,19 +4,22 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <dirent.h>
+#include <sys/types.h>
 #include "../inc/definition.h"
 #include "../inc/structures.h"
 
 // 初始化HNSW
-void InitalGraph(HNSW_Graph *G)
+void InitalGraph(HNSW_Graph **G)
 {
-    G = (HNSW_Graph *)malloc(sizeof(HNSW_Graph));
-    G->highestLevel = -1;                                                   // 此时即使第0层也没有点
-    G->nodeCount = 0;                                                       // 没有点
-    G->pEntryPointList = (Node **)malloc(sizeof(Node *) * (MAX_LAYER + 1)); // 入口点数组
+    (*G) = (HNSW_Graph *)malloc(sizeof(HNSW_Graph));
+    (*G)->highestLevel = 0;                                              // 事实上此时即使第0层也没有点
+    (*G)->nodeCount = 0;                                                 // 没有点
+    (*G)->pEntryPointList = (Node **)malloc(sizeof(Node *) * MAX_LAYER); // 入口点数组
 }
 
 // 插入新节点
+
 Node *InsertNode(HNSW_Graph *G, NodeDataType data)
 {
     int level = RandomLevel();
@@ -32,11 +35,11 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
 
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
-    SL->candidatePointList = calloc(MAX_POINT, sizeof(Node *));  // 候选节点数组 定长
-    SL->candidatePointList2 = calloc(MAX_POINT, sizeof(Node *)); // 候选节点数组的影子数组 定长
-    SL->visitedPointList = calloc(1, sizeof(Node *));               // 访问过节点数组 变长 当空间不足时长度加倍
-    SL->visitedPointCount = 0;                                      // 访问过节点数
-    SL->candidatePointList[SL->candidatePointCount++] = G->pEntryPointList[level];          // 第一个候选节点为入口点
+    SL->candidatePointList = calloc(MAX_POINT, sizeof(Node *));                    // 候选节点数组 定长
+    SL->candidatePointList2 = calloc(MAX_POINT, sizeof(Node *));                   // 候选节点数组的影子数组 定长
+    SL->visitedPointList = calloc(1, sizeof(Node *));                              // 访问过节点数组 变长 当空间不足时长度加倍
+    SL->visitedPointCount = 0;                                                     // 访问过节点数
+    SL->candidatePointList[SL->candidatePointCount++] = G->pEntryPointList[level]; // 第一个候选节点为入口点
 
     // 每一层插入节点
     for (int i = level; i >= 0; i--)
@@ -74,8 +77,14 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data)
 
 // 连接新节点与第level层的m-邻近节点
 void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
+<<<<<<< HEAD
 {   
     //第一步，将入口点及其相连节点存入候选节点数组
+=======
+{
+    // 第一步，将入口点及其相连节点存入候选节点数组
+    int sum;                             // 记录当前待比较的节点数目
+>>>>>>> e9a01c468b5e6876f355d5ee995b33d545065dbc
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
     InsertVisitedPointList(SL, p);       // 将第一个候选节点存入访问过节点数组
     for (int i = 0; i < MAX_NEAR && p->pList[i] != NULL; i++)
@@ -132,7 +141,6 @@ void ConnectNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL)
     }
 }
 
-
 // 将候选节点数组中的前n个节点按照距离做插入排序
 void insertionSort(SearchList *SL, int n)
 {
@@ -149,15 +157,14 @@ void insertionSort(SearchList *SL, int n)
     }
 }
 
-
 // 将节点存入访问过节点数组
 void InsertVisitedPointList(SearchList *SL, Node *node)
-{   
-    //若空间不足（即Count为2的幂方时），空间翻倍，然后初始化
+{
+    // 若空间不足（即Count为2的幂方时），空间翻倍，然后初始化
     if (SL->visitedPointCount && !(SL->visitedPointCount & (SL->visitedPointCount - 1)))
     {
         SL->visitedPointList = realloc(SL->visitedPointList, sizeof(Node *) * SL->visitedPointCount * 2);
-        for(int i = SL->visitedPointCount; i < SL->visitedPointCount * 2; i++)
+        for (int i = SL->visitedPointCount; i < SL->visitedPointCount * 2; i++)
         {
             SL->visitedPointList[i] = NULL;
         }
@@ -165,31 +172,43 @@ void InsertVisitedPointList(SearchList *SL, Node *node)
     SL->visitedPointList[SL->visitedPointCount++] = node;
 }
 
+<<<<<<< HEAD
 
 //将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
 void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode)
 {   
     //查询节点是否已经在候选节点数组中
     for(int i = 0; i < SL->visitedPointCount; i++)
+=======
+// 将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
+void InsertCandidatePointList(SearchList *SL, Node *node)
+{
+    // 查询节点是否已经在候选节点数组中
+    for (int i = 0; i < SL->visitedPointCount; i++)
+>>>>>>> e9a01c468b5e6876f355d5ee995b33d545065dbc
     {
-        if(SL->visitedPointList[i] == node)
+        if (SL->visitedPointList[i] == node)
         {
             return;
         }
     }
+<<<<<<< HEAD
     node->distance = Distance(newNode, node);
     //二分查找，插入候选节点数组，后面元素后移
+=======
+    // 二分查找，插入候选节点数组，后面元素后移
+>>>>>>> e9a01c468b5e6876f355d5ee995b33d545065dbc
     int left = 0;
     int right = SL->candidatePointCount - 1;
     int mid;
-    while(left <= right)
+    while (left <= right)
     {
         mid = (left + right) / 2;
-        if(SL->candidatePointList[mid]->distance == node->distance)
+        if (SL->candidatePointList[mid]->distance == node->distance)
         {
             break;
         }
-        else if(SL->candidatePointList[mid]->distance < node->distance)
+        else if (SL->candidatePointList[mid]->distance < node->distance)
         {
             left = mid + 1;
         }
@@ -198,22 +217,21 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode)
             right = mid - 1;
         }
     }
-    for(int i = SL->candidatePointCount; i > mid; i--)
+    for (int i = SL->candidatePointCount; i > mid; i--)
     {
-        //若SL->candidatePointCount == MAX_POINT，则会越界
-        if(i == MAX_POINT)
+        // 若SL->candidatePointCount == MAX_POINT，则会越界
+        if (i == MAX_POINT)
         {
             continue;
         }
         SL->candidatePointList[i] = SL->candidatePointList[i - 1];
     }
     SL->candidatePointList[mid] = node;
-    if(SL->candidatePointCount < MAX_POINT)
+    if (SL->candidatePointCount < MAX_POINT)
     {
         SL->candidatePointCount++;
     }
 }
-
 
 // 搜索m-邻近节点
 void Search(HNSW_Graph *G)
@@ -221,8 +239,8 @@ void Search(HNSW_Graph *G)
     // critical and hard!
 }
 
-
 // 随机插入层数
+
 int RandomLevel()
 {
     double u = (double)rand() / RAND_MAX;
@@ -233,7 +251,6 @@ int RandomLevel()
     }
     return level;
 }
-
 
 float CosineDistance(float *a, float *b, int size)
 {
@@ -247,7 +264,6 @@ float CosineDistance(float *a, float *b, int size)
     return dot / (sqrt(denom_a) * sqrt(denom_b));
 }
 
-
 void ReadVectorFromFile(char *filename, float *vector, int size)
 {
     FILE *file = fopen(filename, "r");
@@ -258,8 +274,8 @@ void ReadVectorFromFile(char *filename, float *vector, int size)
     fclose(file);
 }
 
-
 // 计算两个节点之间的距离（当前为余弦距离函数）
+
 float Distance(Node *a, Node *b)
 {
     float distance;
@@ -273,4 +289,79 @@ float Distance(Node *a, Node *b)
     ReadVectorFromFile(filepath2, vector2, VECTORSIZE);
     distance = CosineDistance(vector1, vector2, VECTORSIZE);
     return distance;
+}
+
+// 暴力搜索
+
+int findMinIndex(float *result)
+{
+    int minIndex = 0;
+    for (int i = 0; i < MAX_NEAR; i++)
+    {
+        if (result[i] < result[minIndex])
+        {
+            minIndex = i;
+        }
+    }
+    return minIndex;
+}
+
+void BruteForceSearch(Node *a, float *result, int *resultIndex)
+{
+    Node temp;
+    for (int i = 0; i < DATASUM; i++)
+    {
+        temp.data = i;
+        float distance = Distance(a, &temp);
+        // printf("%f\n", distance);
+        int minIndex = findMinIndex(result);
+        if (distance > result[minIndex])
+        {
+            result[minIndex] = distance;
+            resultIndex[minIndex] = i;
+        }
+    }
+}
+
+void ShowMenu(int choice)
+{
+    switch (choice)
+    {
+    case 0:
+    {
+        // system("clear");
+        printf("---------------HNSW---------------\n");
+        printf("0. Exit\n");
+        printf("1. HNSW: Build Graph\n");
+        printf("2. HNSW: Search\n");
+
+        printf("Please input your choice:");
+        break;
+    }
+    case 1:
+    {
+        // system("clear");
+        printf("-----------HNSW-DATASET-----------\n");
+        printf("0. Return\n");
+        printf("1. All\n");
+        printf("2. Aircraft\n");
+        printf("3. Clothing\n");
+        printf("4. Flower\n");
+        printf("5. food\n");
+        printf("6. Logo\n");
+        printf("7. Custom\n");
+        printf("Please input your choice:");
+        break;
+    }
+    case 2:
+    {
+        // system("clear");
+        printf("--------HNSW-SEARCH-OBJECT--------\n");
+        printf("0. Return\n");
+        printf("1. Custom\n");
+        printf("2-%d: Given images from random selecting\n", SEARCH_OBJECT_NUM + 2);
+        printf("Please input your choice:");
+        break;
+    }
+    }
 }
