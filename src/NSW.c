@@ -87,6 +87,8 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
             // BUG: 每个图的第一个点的插入应该需要做单独处理
             // 释放上一层访问过节点数组 重新分配
             free(SL->visitedPointList);
+            SL->visitedPointCount = 0;
+            SL->visitedPointList = NULL;
             SL->visitedPointList = calloc(1, sizeof(Node *));
         }
         if (i == 0)
@@ -103,7 +105,6 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
             //  候选点的初始分配空间为MAX_NEAR，若不足则重新分配+1空间，然后插入新节点
             if (SL->candidatePointList[j]->connectCount >= MAX_NEAR) // 初始分配空间已满
             {
-                printf("BBBBBBB\n");
                 SL->candidatePointList[j]->pList = realloc(SL->candidatePointList[j]->pList, sizeof(Node *) * (SL->candidatePointList[j]->connectCount + 1));
                 // XXX: realloc?
             }
@@ -150,8 +151,6 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
         {
             for (int j = 0; j < MAX_NEAR && SL->candidatePointList2[i]->pList[j] != NULL; j++)
             {
-                // printf("i=%d,j=%d\n", i, j);
-                // printf("%p\n", SL->candidatePointList2[i]->pList[j]);
                 InsertCandidatePointList(SL, SL->candidatePointList2[i]->pList[j], newNode, filepath);
             }
         }
@@ -177,19 +176,25 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
 }
 
 // 将候选节点数组中的前n个节点按照距离做插入排序
+// XXX: 重复问题
 void insertionSort(SearchList *SL, int n)
 {
     for (int i = 1; i < n; i++)
     {
         Node *temp = SL->candidatePointList[i];
         int j = i - 1;
-        while (j >= 0 && SL->candidatePointList[j]->distance > temp->distance)
+        while (j >= 0 && SL->candidatePointList[j]->distance < temp->distance)
         {
             SL->candidatePointList[j + 1] = SL->candidatePointList[j];
             j--;
         }
         SL->candidatePointList[j + 1] = temp;
     }
+    for (int i = 0; i < n; i++)
+    {
+        printf("Data= %d Distance= %f\n", SL->candidatePointList[i]->data, SL->candidatePointList[i]->distance);
+    }
+    printf("\n");
 }
 
 // 将节点存入访问过节点数组
@@ -199,8 +204,6 @@ void InsertVisitedPointList(SearchList *SL, Node *node)
     // 若空间不足（即Count为2的幂方时），空间翻倍，然后初始化
     if (SL->visitedPointCount && !(SL->visitedPointCount & (SL->visitedPointCount - 1)))
     {
-        printf("AAAAA\n");
-        printf("sizeof(Node *) * SL->visitedPointCount * 2=%ld\n", sizeof(Node *) * SL->visitedPointCount * 2);
         SL->visitedPointList = realloc(SL->visitedPointList, sizeof(Node *) * SL->visitedPointCount * 2);
 
         for (int i = SL->visitedPointCount; i < SL->visitedPointCount * 2; i++)
@@ -209,7 +212,6 @@ void InsertVisitedPointList(SearchList *SL, Node *node)
         }
     }
     SL->visitedPointList[SL->visitedPointCount++] = node;
-    printf("Count=%d\n", SL->visitedPointCount);
 }
 
 // 将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
@@ -263,6 +265,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
 // 搜索m-邻近节点
 Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath)
 {
+    Node **result = (Node **)malloc(sizeof(Node *) * SEARCH_NUM);
     // 初始化待搜索节点
     Node *SearchNode = (Node *)malloc(sizeof(Node));
     SearchNode->data = data;
@@ -290,19 +293,26 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath)
             }
             SL->candidatePointList[0] = p;
             free(SL->visitedPointList);
+            SL->visitedPointList = NULL;
+            SL->visitedPointCount = 0;
             SL->visitedPointList = calloc(1, sizeof(Node *));
         }
         FindNode(G, SearchNode, i, SL, filepath);
         p = SL->candidatePointList[0];
+        printf("level = %d\n", i);
+        for (int j = 0; j < SL->candidatePointCount; j++)
+        {
+            printf("candidatePointList[%d]=%d\n", j, SL->candidatePointList[j]->data);
+        }
         if (i == 0)
         {
-            Node **result = (Node **)malloc(sizeof(Node *) * SEARCH_NUM);
             for (int j = 0; j < SEARCH_NUM && SEARCH_NUM <= SL->candidatePointCount; j++)
             {
                 result[j] = SL->candidatePointList[j];
             }
         }
     }
+    return result;
 }
 
 // 随机插入层数
@@ -379,7 +389,6 @@ void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath)
     {
         temp.data = i;
         float distance = Distance(a, &temp, filepath);
-        // printf("%f\n", distance);
         int minIndex = findMinIndex(result);
         if (distance > result[minIndex])
         {
