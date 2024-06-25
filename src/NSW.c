@@ -20,18 +20,37 @@ void InitalGraph(HNSW_Graph **G)
 Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
 {
     int level = RandomLevel();
-    printf("level:%d\n", level);
-    Node *lastNode;                                              // 记录上一层的同节点，用于连接层与层
-    Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
-    newNode->data = data;                                        // 赋值
-    newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
-    newNode->connectCount = 0;                                   // 连接数为0
+    Node *lastNode = NULL;                                              // 记录上一层的同节点，用于连接层与层
     if (level > G->highestLevel)                                 // 每一层的第一个节点都作为入口点
     {
         // XXX: 初始化要在这里完成
         G->highestLevel = level;
-        G->pEntryPointList[level] = newNode;
+        for(; level >=0; level--)
+        {
+            if(G->pEntryPointList[level] == NULL)
+            {
+                Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
+                newNode->data = data;                                        // 赋值
+                newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
+                newNode->connectCount = 0;                                   // 连接数为0
+                G->pEntryPointList[level] = newNode;
+                if(lastNode != NULL)
+                {
+                    lastNode->nextLevel = newNode;
+                }
+                lastNode = newNode;
+            }
+            else
+            {
+                break;
+            }
+        }
     }
+    Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
+    newNode->data = data;                                        // 赋值
+    newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
+    newNode->connectCount = 0;                                   // 连接数为0
+    lastNode->nextLevel = newNode;
 
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
