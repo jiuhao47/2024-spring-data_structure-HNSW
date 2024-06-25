@@ -379,7 +379,7 @@ float Distance(Node *a, Node *b, char *filepath_a, char *filepath_b)
 int findMinIndex(float *result)
 {
     int minIndex = 0;
-    for (int i = 0; i < MAX_NEAR; i++)
+    for (int i = 0; i < SEARCH_NUM; i++)
     {
         if (result[i] < result[minIndex])
         {
@@ -396,7 +396,8 @@ void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath_a
     {
         temp.data = i;
         float distance = Distance(a, &temp, filepath_a, filepath_b);
-        int minIndex = findMinIndex(result);
+        int minIndex = 0;
+        minIndex = findMinIndex(result);
         if (distance > result[minIndex])
         {
             result[minIndex] = distance;
