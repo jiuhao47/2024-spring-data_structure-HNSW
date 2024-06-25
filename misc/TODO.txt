@@ -5,13 +5,14 @@
 //DONE: 图片转向量库函数研究
 //DONE: 距离函数
 //DONE: 衔接，索引
-//TODO: Init
-//TODO: Insert
-//TODO: Search
+//DONE: Init
+//DONE: Insert
+//DONE: Search
+//TODO: 递归FindNode
 //TODO: Destroy
-//XXX: 性能评估
+//TODO: 性能评估：时间复杂度，在不同的数据集上表现以及解释，性能评价指标（需要调研：余弦距离的评价方式）（最好结果差距，最坏结果差距，平均结果差距），空间复杂度
 //DONE: 与暴力搜索对比
-//TODO: 命令行前端Ver（支持单独导入图片）
-//TODO: 调试Ver及批处理
+//DONE: 命令行前端Ver（//TODO: 支持单独导入图片）
+//DONE: 调试Ver
+//TODO: 批处理
 //TODO: 实验报告Doc
-

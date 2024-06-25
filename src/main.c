@@ -8,6 +8,7 @@
 
 char dataset_filepath[FILEPATHLEN];
 char search_filepath[FILEPATHLEN];
+Node *nodeList[POINT_SUM];
 int main()
 {
     HNSW_Graph *HNSW_Graph_Instance;
@@ -41,16 +42,13 @@ int main()
                 if (HNSW_Graph_Instance->nodeCount == 0)
                 {
                     snprintf(dataset_filepath, FILEPATHLEN, "%s%s%s", "../data/preprocess/", datasets[dataset_choice - 1], "/%d.txt");
-                    HNSW_Graph_Instance->nodeCount = 1;
-                    // 建图，dataset_filepath为文件路径，HNSW_Graph_Instance为图
-                    /*
+                    // HNSW_Graph_Instance->nodeCount = 1;
+                    //  建图，dataset_filepath为文件路径，HNSW_Graph_Instance为图
                     for (int i = 0; i < 1000; i++)
                     {
-                        InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath);
+                        nodeList[i] = InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath);
                     }
                     printf("Done!");
-                    */
-                    // BUG:layer=0 next?
                 }
                 else
                 {
@@ -96,7 +94,7 @@ int main()
                         ReturnList = Search(HNSW_Graph_Instance, index, search_filepath, dataset_filepath);
                         for (int i = 0; i < SEARCH_NUM; i++)
                         {
-                            printf("ReturnList[%d]=%d\n", i, ReturnList[i]->data);
+                            printf("ReturnList[%d]=%d Distance = %f\n", i, ReturnList[i]->data, ReturnList[i]->distance);
                         }
                         Node *tempNode = (Node *)malloc(sizeof(Node));
                         tempNode->data = index;
@@ -118,7 +116,7 @@ int main()
                         ReturnList = Search(HNSW_Graph_Instance, index, search_filepath, dataset_filepath);
                         for (int i = 0; i < SEARCH_NUM; i++)
                         {
-                            printf("ReturnList[%d]=%d\n", i, ReturnList[i]->data);
+                            printf("ReturnList[%d]=%d Distance = %f\n", i, ReturnList[i]->data, ReturnList[i]->distance);
                         }
                         Node *tempNode = (Node *)malloc(sizeof(Node));
 

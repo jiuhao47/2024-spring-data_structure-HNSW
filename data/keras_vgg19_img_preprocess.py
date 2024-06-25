@@ -15,7 +15,7 @@ source_directory = [
 ]
 """
 source_directory = [
-    "aircraft",
+    "logo",
 ]
 file_path = "./imgInput/"
 search_path = "./imgInput/search/"

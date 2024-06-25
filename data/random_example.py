@@ -19,7 +19,7 @@ source_directory = [
 ]
 """
 source_directory = [
-    "aircraft",
+    "logo",
 ]
 root_directory = "/home/jiuhao/Workspace/Downloads/dataset/"
 

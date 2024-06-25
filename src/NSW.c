@@ -24,7 +24,6 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
     Node *lastNode = NULL;       // 记录上一层的同节点，用于连接层与层
     if (level > G->highestLevel) // 每一层的第一个节点都作为入口点
     {
-        // XXX: 初始化要在这里完成
         G->highestLevel = level;
         for (; level >= 0; level--)
         {
@@ -84,7 +83,6 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
             }
             SL->candidatePointList2[0] = NULL;
             SL->candidatePointList[0] = SL->candidatePointList[0]->nextLevel;
-            // BUG: 每个图的第一个点的插入应该需要做单独处理
             // 释放上一层访问过节点数组 重新分配
             free(SL->visitedPointList);
             SL->visitedPointCount = 0;
@@ -106,7 +104,6 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
             if (SL->candidatePointList[j]->connectCount >= MAX_NEAR) // 初始分配空间已满
             {
                 SL->candidatePointList[j]->pList = realloc(SL->candidatePointList[j]->pList, sizeof(Node *) * (SL->candidatePointList[j]->connectCount + 1));
-                // XXX: realloc?
             }
             SL->candidatePointList[j]->pList[SL->candidatePointList[j]->connectCount++] = newNode;
         }
@@ -176,13 +173,13 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
     }
 }
 
-//子算法，用于查找某一点周围最近的一个点
-Node *FindSingleNode(HNSW_Graph *G, Node *node){
-    //初始化动态长度的Candidate
+// 子算法，用于查找某一点周围最近的一个点
+Node *FindSingleNode(HNSW_Graph *G, Node *node)
+{
+    // 初始化动态长度的Candidate
 }
 
 // 将候选节点数组中的前n个节点按照距离做插入排序
-// XXX: 重复问题
 void insertionSort(SearchList *SL, int n)
 {
     for (int i = 1; i < n; i++)
@@ -372,7 +369,6 @@ float Distance(Node *a, Node *b, char *filepath_a, char *filepath_b)
     distance = CosineDistance(vector1, vector2, VECTORSIZE);
     return distance;
 }
-// BUG: a,b不在一个目录问题！
 
 // 暴力搜索
 
