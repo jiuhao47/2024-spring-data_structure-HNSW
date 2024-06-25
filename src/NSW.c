@@ -10,9 +10,9 @@
 void InitalGraph(HNSW_Graph **G)
 {
     (*G) = (HNSW_Graph *)malloc(sizeof(HNSW_Graph));
-    (*G)->highestLevel = 0;                                              // 事实上此时即使第0层也没有点
-    (*G)->nodeCount = 0;                                                 // 没有点
-    (*G)->pEntryPointList = (Node **)malloc(sizeof(Node *) * MAX_LAYER); // 入口点数组
+    (*G)->highestLevel = -1;                                                   // 事实上此时即使第0层也没有点
+    (*G)->nodeCount = 0;                                                       // 没有点
+    (*G)->pEntryPointList = (Node **)malloc(sizeof(Node *) * (MAX_LAYER + 1)); // 入口点数组
 }
 
 // 插入新节点
@@ -20,21 +20,21 @@ void InitalGraph(HNSW_Graph **G)
 Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
 {
     int level = RandomLevel();
-    Node *lastNode = NULL;                                              // 记录上一层的同节点，用于连接层与层
-    if (level > G->highestLevel)                                 // 每一层的第一个节点都作为入口点
+    Node *lastNode = NULL;       // 记录上一层的同节点，用于连接层与层
+    if (level > G->highestLevel) // 每一层的第一个节点都作为入口点
     {
         // XXX: 初始化要在这里完成
         G->highestLevel = level;
-        for(; level >=0; level--)
+        for (; level >= 0; level--)
         {
-            if(G->pEntryPointList[level] == NULL)
+            if (G->pEntryPointList[level] == NULL)
             {
                 Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
                 newNode->data = data;                                        // 赋值
                 newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
                 newNode->connectCount = 0;                                   // 连接数为0
                 G->pEntryPointList[level] = newNode;
-                if(lastNode != NULL)
+                if (lastNode != NULL)
                 {
                     lastNode->nextLevel = newNode;
                 }
@@ -49,9 +49,11 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
     Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
     newNode->data = data;                                        // 赋值
     newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
-    newNode->connectCount = 0;                                   // 连接数为0
-    lastNode->nextLevel = newNode;
-
+    newNode->connectCount = 0;
+    if (lastNode != NULL)
+    {
+        lastNode->nextLevel = newNode; // 连接数为0
+    }
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
     SL->candidatePointList = calloc(MAX_POINT, sizeof(Node *));                    // 候选节点数组 定长
@@ -104,6 +106,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
         // 注意第0层连接NULL
         lastNode = newNode;
     }
+    G->nodeCount++;
     return newNode;
 }
 
@@ -143,7 +146,9 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
             }
         }
         // 判断候选节点数组和影子数组（至少）前MAX_NEAR项是否相同，若不相同则更新影子数组，若相同则找到m-邻近节点,进行连接
-        for (int i = 0; i < MAX_NEAR && SL->candidatePointList[i] != NULL; i++)
+        // for (int i = 0; i < MAX_NEAR && SL->candidatePointList[i] != NULL; i++)
+        // XXX: 列表动态判断相等循环条件存疑
+        for (int i = 0; i < MAX_NEAR; i++)
         {
             if (SL->candidatePointList[i] != SL->candidatePointList2[i])
             {
