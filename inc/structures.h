@@ -24,13 +24,18 @@ typedef struct SearchList
     int candidatePointCount;    // 候选节点数
 } SearchList;
 void InitalGraph(HNSW_Graph **G);
-Node *InsertNode(HNSW_Graph *G, NodeDataType data);
-void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL);
-Node *Search(HNSW_Graph *G, NodeDataType data);
+Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath);
+
+void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *filepath);
+void insertionSort(SearchList *SL, int n);
+void InsertVisitedPointList(SearchList *SL, Node *node);
+void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *filepath);
+Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath);
+
 int RandomLevel();
 float CosineDistance(float *a, float *b, int size);
 void ReadVectorFromFile(char *filename, float *vector, int size);
-float Distance(Node *a, Node *b);
+float Distance(Node *a, Node *b, char *filepath);
 int findMinIndex(float *result);
-void BruteForceSearch(Node *a, float *result, int *resultIndex);
+void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath);
 void ShowMenu(int choice);

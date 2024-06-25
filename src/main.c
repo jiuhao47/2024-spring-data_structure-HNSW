@@ -42,7 +42,10 @@ int main()
                 {
                     snprintf(dataset_filepath, FILEPATHLEN, "%s%s%s", "../data/preprocess/", datasets[dataset_choice - 1], "/%d.txt");
                     // 建图，dataset_filepath为文件路径，HNSW_Graph_Instance为图
-                    HNSW_Graph_Instance->nodeCount = 1;
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        InsertNode(HNSW_Graph_Instance, i, dataset_filepath);
+                    }
                 }
                 else
                 {
