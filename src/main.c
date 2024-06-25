@@ -45,8 +45,10 @@ int main()
 
                     for (int i = 0; i < 100; i++)
                     {
-                        InsertNode(HNSW_Graph_Instance, i, dataset_filepath);
+                        InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath);
                     }
+                    printf("Done!");
+                    // BUG:layer=0 next?
                 }
                 else
                 {
@@ -81,14 +83,14 @@ int main()
                 {
                     if (search_choice == 1)
                     {
-                        snprintf(dataset_filepath, FILEPATHLEN, "%s", "../data/preprocess/search");
+                        snprintf(search_filepath, FILEPATHLEN, "%s", "../data/preprocess/search");
                         printf("\nFiles:\n");
                         system("ls ../data/preprocess/search");
                         printf("Please input the index:");
                         int index;
                         scanf("%d", &index);
                         Node **ReturnList = (Node **)malloc(sizeof(Node *) * SEARCH_NUM);
-                        ReturnList = Search(HNSW_Graph_Instance, index, dataset_filepath);
+                        ReturnList = Search(HNSW_Graph_Instance, index, search_filepath, dataset_filepath);
                         for (int i = 0; i < SEARCH_NUM; i++)
                         {
                             printf("ReturnList[%d]=%d\n", i, ReturnList[i]->data);
@@ -99,6 +101,16 @@ int main()
                     {
                         snprintf(search_filepath, FILEPATHLEN, "%s", "../data/preprocess/search/%d.txt");
                         int index = search_choice;
+                        Node **ReturnList = (Node **)malloc(sizeof(Node *) * SEARCH_NUM);
+                        ReturnList = Search(HNSW_Graph_Instance, index, search_filepath, dataset_filepath);
+                        for (int i = 0; i < SEARCH_NUM; i++)
+                        {
+                            printf("ReturnList[%d]=%d\n", i, ReturnList[i]->data);
+                        }
+                        float result[SEARCH_NUM];
+                        int resultIndex[SEARCH_NUM];
+                        BruteForceSearch(HNSW_Graph_Instance->pEntryPointList[index], result, resultIndex, search_filepath, dataset_filepath);
+
                         // 查找，index为文件索引，search_filepath为文件路径
 
                         // 搜索返回结果，然后处理结果（返回搜索图与m临近图到output文件夹）

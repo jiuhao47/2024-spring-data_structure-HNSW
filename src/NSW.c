@@ -17,7 +17,7 @@ void InitalGraph(HNSW_Graph **G)
 
 // 插入新节点
 
-Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
+Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b)
 {
     int level = RandomLevel();
     printf("Data=%d Level=%d\n", data, level);
@@ -96,7 +96,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
             newNode->nextLevel = NULL;
         }
         // 每一层要连接m-邻近节点，上面先维护更新SL的成员，再调用FindNode函数
-        FindNode(G, newNode, i, SL, filepath);
+        FindNode(G, newNode, i, SL, filepath_a, filepath_b);
         // 连接
         for (int j = 0; (j < MAX_NEAR) && (SL->candidatePointList[j] != NULL); j++)
         {
@@ -119,7 +119,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
 }
 
 // 连接新节点与第level层的m-邻近节点
-void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *filepath)
+void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *filepath_a, char *filepath_b)
 {
     // 第一步，将入口点及其相连节点存入候选节点数组
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
@@ -134,7 +134,7 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
     // 完成对距离的计算 复制候选节点数组到影子数组
     for (int i = 0; i < SL->candidatePointCount; i++)
     {
-        SL->candidatePointList[i]->distance = Distance(newNode, SL->candidatePointList[i], filepath);
+        SL->candidatePointList[i]->distance = Distance(newNode, SL->candidatePointList[i], filepath_a, filepath_b);
     }
     // 对候选节点进行排序
     insertionSort(SL, SL->candidatePointCount);
@@ -151,7 +151,8 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
         {
             for (int j = 0; j < MAX_NEAR && SL->candidatePointList2[i]->pList[j] != NULL; j++)
             {
-                InsertCandidatePointList(SL, SL->candidatePointList2[i]->pList[j], newNode, filepath);
+                InsertVisitedPointList(SL, SL->candidatePointList2[i]->pList[j]);
+                InsertCandidatePointList(SL, SL->candidatePointList2[i]->pList[j], newNode, filepath_a, filepath_b);
             }
         }
         // 判断候选节点数组和影子数组（至少）前MAX_NEAR项是否相同，若不相同则更新影子数组，若相同则找到m-邻近节点,进行连接
@@ -215,7 +216,7 @@ void InsertVisitedPointList(SearchList *SL, Node *node)
 }
 
 // 将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
-void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *filepath)
+void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *filepath_a, char *filepath_b)
 {
     // 查询节点是否已经在候选节点数组中
     for (int i = 0; i < SL->visitedPointCount; i++)
@@ -225,7 +226,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
             return;
         }
     }
-    node->distance = Distance(newNode, node, filepath);
+    node->distance = Distance(newNode, node, filepath_a, filepath_b);
     // 二分查找，插入候选节点数组，后面元素后移
     int left = 0;
     int right = SL->candidatePointCount - 1;
@@ -263,7 +264,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
 }
 
 // 搜索m-邻近节点
-Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath)
+Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b)
 {
     Node **result = (Node **)malloc(sizeof(Node *) * SEARCH_NUM);
     // 初始化待搜索节点
@@ -297,7 +298,7 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath)
             SL->visitedPointCount = 0;
             SL->visitedPointList = calloc(1, sizeof(Node *));
         }
-        FindNode(G, SearchNode, i, SL, filepath);
+        FindNode(G, SearchNode, i, SL, filepath_a, filepath_b);
         p = SL->candidatePointList[0];
         printf("level = %d\n", i);
         for (int j = 0; j < SL->candidatePointCount; j++)
@@ -352,13 +353,13 @@ void ReadVectorFromFile(char *filename, float *vector, int size)
 
 // 计算两个节点之间的距离（当前为余弦距离函数）
 
-float Distance(Node *a, Node *b, char *filepath)
+float Distance(Node *a, Node *b, char *filepath_a, char *filepath_b)
 {
     float distance;
     char filepath1[FILEPATHLEN];
     char filepath2[FILEPATHLEN];
-    sprintf(filepath1, filepath, a->data);
-    sprintf(filepath2, filepath, b->data);
+    sprintf(filepath1, filepath_a, a->data);
+    sprintf(filepath2, filepath_b, b->data);
     float vector1[VECTORSIZE];
     float vector2[VECTORSIZE];
     ReadVectorFromFile(filepath1, vector1, VECTORSIZE);
@@ -383,13 +384,13 @@ int findMinIndex(float *result)
     return minIndex;
 }
 
-void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath)
+void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath_a, char *filepath_b)
 {
     Node temp;
     for (int i = 0; i < DATASUM; i++)
     {
         temp.data = i;
-        float distance = Distance(a, &temp, filepath);
+        float distance = Distance(a, &temp, filepath_a, filepath_b);
         int minIndex = findMinIndex(result);
         if (distance > result[minIndex])
         {
@@ -435,7 +436,7 @@ void ShowMenu(int choice)
         printf("--------HNSW-SEARCH-OBJECT--------\n");
         printf("0. Return\n");
         printf("1. Custom\n");
-        printf("2-%d: Given images from random selecting\n", SEARCH_OBJECT_NUM + 2);
+        printf("2-%d: Given images from random selecting\n", SEARCH_OBJECT_NUM + 1);
         printf("Please input your choice:");
         break;
     }

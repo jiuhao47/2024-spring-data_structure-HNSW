@@ -19,17 +19,22 @@ source_directory = [
 ]
 """
 source_directory = [
-    "clothing",
+    "aircraft",
 ]
 root_directory = "/home/jiuhao/Workspace/Downloads/dataset/"
 
-target_directory = "./img_input/"
+target_directory = "./imgInput/"
+target_search_directory = "./imgInput/search"
 for name in source_directory:
     directory = root_directory + name
     target = target_directory + name
     all_files = list(list_all_files(directory))
-    selected_files = random.sample(all_files, 1000)
+    selected_files = random.sample(all_files, 1010)
 
     for i, file in enumerate(selected_files):
-        new_file_name = os.path.join(target, f"{i}.jpg")
-        shutil.copy(file, new_file_name)
+        if i < 1000:
+            new_file_name = os.path.join(target, f"{i}.jpg")
+            shutil.copy(file, new_file_name)
+        else:
+            new_file_name = os.path.join(target_search_directory, f"{i-1000+2}.jpg")
+            shutil.copy(file, new_file_name)

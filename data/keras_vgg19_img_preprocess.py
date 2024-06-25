@@ -11,12 +11,14 @@ source_directory = [
     "aircraft",
     "food",
     "clothing",
+    "custom",
 ]
 """
 source_directory = [
-    "clothing",
+    "aircraft",
 ]
-file_path = "./img_input/"
+file_path = "./imgInput/"
+search_path = "./imgInput/search/"
 # 加载预训练的VGG19模型，不包括顶部的全连接层
 model = VGG19(weights="imagenet", include_top=False)
 
@@ -49,3 +51,13 @@ for name in source_directory:
             with open("./preprocess/" + name + "/" + index + ".txt", "w") as f:
                 f.write(" ".join(str(x) for x in features))
                 f.close()
+directory = search_path
+for file in sorted(os.listdir(directory)):
+    if file.endswith(".jpg"):
+        img_path = os.path.join(directory, file)
+        features = extract_features(img_path)
+        index = file[:-4]
+        print(index)
+        with open("./preprocess/search/" + index + ".txt", "w") as f:
+            f.write(" ".join(str(x) for x in features))
+            f.close()
