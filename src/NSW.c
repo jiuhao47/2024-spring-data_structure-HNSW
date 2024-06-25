@@ -366,6 +366,7 @@ float Distance(Node *a, Node *b, char *filepath)
     distance = CosineDistance(vector1, vector2, VECTORSIZE);
     return distance;
 }
+// BUG: a,b不在一个目录问题！
 
 // 暴力搜索
 
