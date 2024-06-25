@@ -57,8 +57,8 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
     }
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
-    SL->candidatePointList = calloc(MAX_POINT, sizeof(Node *));                    // 候选节点数组 定长
-    SL->candidatePointList2 = calloc(MAX_POINT, sizeof(Node *));                   // 候选节点数组的影子数组 定长
+    SL->candidatePointList = calloc(POINT_SUM, sizeof(Node *));                    // 候选节点数组 定长
+    SL->candidatePointList2 = calloc(POINT_SUM, sizeof(Node *));                   // 候选节点数组的影子数组 定长
     SL->visitedPointList = calloc(1, sizeof(Node *));                              // 访问过节点数组 变长 当空间不足时长度加倍
     SL->visitedPointCount = 0;                                                     // 访问过节点数
     SL->candidatePointCount = 0;                                                   // 候选节点数
@@ -77,7 +77,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
             newNode->connectCount = 0;
             lastNode->nextLevel = newNode;
             // 第一个候选节点为上一层搜索到的最近节点，其余为NULL
-            for (int j = 1; j < MAX_POINT; j++)
+            for (int j = 1; j < POINT_SUM; j++)
             {
                 SL->candidatePointList[j] = NULL;
                 SL->candidatePointList2[j] = NULL;
@@ -125,7 +125,7 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
     SL->candidatePointCount = 1;
     InsertVisitedPointList(SL, p); // 将第一个候选节点存入访问过节点数组
-    for (int i = 0; (i < MAX_NEAR) && (p->pList[i] != NULL); i++)
+    for (int i = 0; (i < p->connectCount) && (p->pList[i] != NULL); i++)
     {
         SL->candidatePointList[i + 1] = p->pList[i];
         InsertVisitedPointList(SL, p->pList[i]);
@@ -147,9 +147,9 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
     while (1)
     {
         // 从（影子的）第一个候选节点开始搜索m-邻近节点，并存入候选节点数组
-        for (int i = 0; i <= MAX_NEAR && SL->candidatePointList2[i] != NULL; i++)
+        for (int i = 0; i <= SL->candidatePointList2[0]->connectCount && SL->candidatePointList2[i] != NULL; i++)
         {
-            for (int j = 0; j < MAX_NEAR && SL->candidatePointList2[i]->pList[j] != NULL; j++)
+            for (int j = 0; j < SL->candidatePointList2[i]->connectCount && SL->candidatePointList2[i]->pList[j] != NULL; j++)
             {
                 InsertVisitedPointList(SL, SL->candidatePointList2[i]->pList[j]);
                 InsertCandidatePointList(SL, SL->candidatePointList2[i]->pList[j], newNode, filepath_a, filepath_b);
@@ -174,6 +174,11 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
             }
         }
     }
+}
+
+//子算法，用于查找某一点周围最近的一个点
+Node *FindSingleNode(HNSW_Graph *G, Node *node){
+    //初始化动态长度的Candidate
 }
 
 // 将候选节点数组中的前n个节点按照距离做插入排序
@@ -249,15 +254,15 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
     }
     for (int i = SL->candidatePointCount; i > mid; i--)
     {
-        // 若SL->candidatePointCount == MAX_POINT，则会越界
-        if (i == MAX_POINT)
+        // 若SL->candidatePointCount == POINT_SUM, 则越界
+        if (i == POINT_SUM)
         {
             continue;
         }
         SL->candidatePointList[i] = SL->candidatePointList[i - 1];
     }
     SL->candidatePointList[mid] = node;
-    if (SL->candidatePointCount < MAX_POINT)
+    if (SL->candidatePointCount < POINT_SUM)
     {
         SL->candidatePointCount++;
     }
@@ -274,8 +279,8 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath
 
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
-    SL->candidatePointList = calloc(MAX_POINT, sizeof(Node *));  // 候选节点数组 定长
-    SL->candidatePointList2 = calloc(MAX_POINT, sizeof(Node *)); // 候选节点数组的影子数组 定长
+    SL->candidatePointList = calloc(POINT_SUM, sizeof(Node *));  // 候选节点数组 定长
+    SL->candidatePointList2 = calloc(POINT_SUM, sizeof(Node *)); // 候选节点数组的影子数组 定长
     SL->visitedPointList = calloc(1, sizeof(Node *));            // 访问过节点数组 变长 当空间不足时长度加倍
     SL->visitedPointCount = 0;                                   // 访问过节点数
     SL->candidatePointCount = 0;                                 // 候选节点数
@@ -287,7 +292,7 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath
         if (i != G->highestLevel)
         {
             p = p->nextLevel;
-            for (int j = 0; j < MAX_POINT; j++)
+            for (int j = 0; j < POINT_SUM; j++)
             {
                 SL->candidatePointList[j] = NULL;
                 SL->candidatePointList2[j] = NULL;

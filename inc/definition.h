@@ -1,3 +1,4 @@
+#define POINT_SUM 1000  // Point Sum
 #define MAX_LAYER 10    // Max Layer （从第0层到第9层）
 #define MAX_POINT 111   // Max Point Sum
 #define SEARCH_NUM 5    // Search Num
