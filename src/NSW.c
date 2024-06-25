@@ -20,6 +20,7 @@ void InitalGraph(HNSW_Graph **G)
 Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
 {
     int level = RandomLevel();
+    printf("Data=%d Level=%d\n", data, level);
     Node *lastNode = NULL;       // 记录上一层的同节点，用于连接层与层
     if (level > G->highestLevel) // 每一层的第一个节点都作为入口点
     {
@@ -29,10 +30,10 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
         {
             if (G->pEntryPointList[level] == NULL)
             {
-                Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
-                newNode->data = data;                                        // 赋值
-                newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
-                newNode->connectCount = 0;                                   // 连接数为0
+                Node *newNode = (Node *)malloc(sizeof(Node));      // 最顶层节点分配空间
+                newNode->data = data;                              // 赋值
+                newNode->pList = calloc(MAX_NEAR, sizeof(Node *)); // 分配m-邻近节点空间
+                newNode->connectCount = 0;                         // 连接数为0
                 G->pEntryPointList[level] = newNode;
                 if (lastNode != NULL)
                 {
@@ -46,9 +47,9 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
             }
         }
     }
-    Node *newNode = (Node *)malloc(sizeof(Node));                // 最顶层节点分配空间
-    newNode->data = data;                                        // 赋值
-    newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR); // 分配m-邻近节点空间
+    Node *newNode = (Node *)malloc(sizeof(Node));      // 最顶层节点分配空间
+    newNode->data = data;                              // 赋值
+    newNode->pList = calloc(MAX_NEAR, sizeof(Node *)); // 分配m-邻近节点空间
     newNode->connectCount = 0;
     if (lastNode != NULL)
     {
@@ -72,14 +73,16 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
         {
             newNode = (Node *)malloc(sizeof(Node));
             newNode->data = data;
-            newNode->pList = (Node **)malloc(sizeof(Node *) * MAX_NEAR);
+            newNode->pList = calloc(MAX_NEAR, sizeof(Node *));
+            newNode->connectCount = 0;
             lastNode->nextLevel = newNode;
             // 第一个候选节点为上一层搜索到的最近节点，其余为NULL
-            for (int j = 0; j < MAX_POINT; j++)
+            for (int j = 1; j < MAX_POINT; j++)
             {
                 SL->candidatePointList[j] = NULL;
                 SL->candidatePointList2[j] = NULL;
             }
+            SL->candidatePointList2[0] = NULL;
             SL->candidatePointList[0] = SL->candidatePointList[0]->nextLevel;
             // BUG: 每个图的第一个点的插入应该需要做单独处理
             // 释放上一层访问过节点数组 重新分配
@@ -93,13 +96,16 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
         // 每一层要连接m-邻近节点，上面先维护更新SL的成员，再调用FindNode函数
         FindNode(G, newNode, i, SL, filepath);
         // 连接
-        for (int j = 0; j < MAX_NEAR && SL->candidatePointList[j] != NULL; j++)
+        for (int j = 0; (j < MAX_NEAR) && (SL->candidatePointList[j] != NULL); j++)
         {
-            newNode->pList[newNode->connectCount++] = SL->candidatePointList[j];
-            // 候选点的初始分配空间为MAX_NEAR，若不足则重新分配+1空间，然后插入新节点
-            if (SL->candidatePointList[j]->connectCount == MAX_NEAR) // 初始分配空间已满
+            newNode->pList[newNode->connectCount] = SL->candidatePointList[j];
+            newNode->connectCount++;
+            //  候选点的初始分配空间为MAX_NEAR，若不足则重新分配+1空间，然后插入新节点
+            if (SL->candidatePointList[j]->connectCount >= MAX_NEAR) // 初始分配空间已满
             {
-                SL->candidatePointList[j]->pList = realloc(SL->candidatePointList[j]->pList, sizeof(Node *) * (MAX_NEAR + 1));
+                printf("BBBBBBB\n");
+                SL->candidatePointList[j]->pList = realloc(SL->candidatePointList[j]->pList, sizeof(Node *) * (SL->candidatePointList[j]->connectCount + 1));
+                // XXX: realloc?
             }
             SL->candidatePointList[j]->pList[SL->candidatePointList[j]->connectCount++] = newNode;
         }
@@ -107,6 +113,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath)
         lastNode = newNode;
     }
     G->nodeCount++;
+
     return newNode;
 }
 
@@ -115,8 +122,9 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
 {
     // 第一步，将入口点及其相连节点存入候选节点数组
     Node *p = SL->candidatePointList[0]; // 第一个候选节点
-    InsertVisitedPointList(SL, p);       // 将第一个候选节点存入访问过节点数组
-    for (int i = 0; i < MAX_NEAR && p->pList[i] != NULL; i++)
+    SL->candidatePointCount = 1;
+    InsertVisitedPointList(SL, p); // 将第一个候选节点存入访问过节点数组
+    for (int i = 0; (i < MAX_NEAR) && (p->pList[i] != NULL); i++)
     {
         SL->candidatePointList[i + 1] = p->pList[i];
         InsertVisitedPointList(SL, p->pList[i]);
@@ -142,6 +150,8 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
         {
             for (int j = 0; j < MAX_NEAR && SL->candidatePointList2[i]->pList[j] != NULL; j++)
             {
+                // printf("i=%d,j=%d\n", i, j);
+                // printf("%p\n", SL->candidatePointList2[i]->pList[j]);
                 InsertCandidatePointList(SL, SL->candidatePointList2[i]->pList[j], newNode, filepath);
             }
         }
@@ -185,16 +195,21 @@ void insertionSort(SearchList *SL, int n)
 // 将节点存入访问过节点数组
 void InsertVisitedPointList(SearchList *SL, Node *node)
 {
+
     // 若空间不足（即Count为2的幂方时），空间翻倍，然后初始化
     if (SL->visitedPointCount && !(SL->visitedPointCount & (SL->visitedPointCount - 1)))
     {
+        printf("AAAAA\n");
+        printf("sizeof(Node *) * SL->visitedPointCount * 2=%ld\n", sizeof(Node *) * SL->visitedPointCount * 2);
         SL->visitedPointList = realloc(SL->visitedPointList, sizeof(Node *) * SL->visitedPointCount * 2);
+
         for (int i = SL->visitedPointCount; i < SL->visitedPointCount * 2; i++)
         {
             SL->visitedPointList[i] = NULL;
         }
     }
     SL->visitedPointList[SL->visitedPointCount++] = node;
+    printf("Count=%d\n", SL->visitedPointCount);
 }
 
 // 将节点存入候选节点数组，且边插入边排序，可利用二分查找优化
