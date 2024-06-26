@@ -3,6 +3,8 @@ from keras._tf_keras.keras.preprocessing import image
 from keras._tf_keras.keras.applications.vgg19 import VGG19, preprocess_input
 import numpy as np
 import os
+from random_example import list_all_files
+import shutil
 
 """
 source_directory = [
@@ -15,8 +17,9 @@ source_directory = [
 ]
 """
 source_directory = [
-    "logo",
+    "custom",
 ]
+
 file_path = "./imgInput/"
 search_path = "./imgInput/search/"
 # 加载预训练的VGG19模型，不包括顶部的全连接层
@@ -51,13 +54,26 @@ for name in source_directory:
             with open("./preprocess/" + name + "/" + index + ".txt", "w") as f:
                 f.write(" ".join(str(x) for x in features))
                 f.close()
-directory = search_path
-for file in sorted(os.listdir(directory)):
-    if file.endswith(".jpg"):
-        img_path = os.path.join(directory, file)
-        features = extract_features(img_path)
-        index = file[:-4]
-        print(index)
-        with open("./preprocess/search/" + index + ".txt", "w") as f:
-            f.write(" ".join(str(x) for x in features))
-            f.close()
+
+for name in source_directory:
+    directory = search_path + name
+    for file in sorted(os.listdir(directory)):
+        if file.endswith(".jpg"):
+            img_path = os.path.join(directory, file)
+            features = extract_features(img_path)
+            index = file[:-4]
+            print(index)
+            os.makedirs("./preprocess/search/" + name, exist_ok=True)
+            with open("./preprocess/search/" + name + "/" + index + ".txt", "w") as f:
+                f.write(" ".join(str(x) for x in features))
+                f.close()
+all_directory = file_path + "all/"
+j = 0
+for name in source_directory:
+    directory = file_path + name
+    all_files = list(list_all_files(directory))
+    for i, file in enumerate(all_files):
+        new_file_name = all_directory + str(j) + ".txt"
+        j = j + 1
+        print(new_file_name)
+        shutil.copy(file, new_file_name)
