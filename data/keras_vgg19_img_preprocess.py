@@ -13,6 +13,15 @@ source_directory = [
     "clothing",
     "custom",
 ]
+source_search_directroy = [
+    "flower",
+    "logo",
+    "aircraft",
+    "food",
+    "clothing",
+    "custom",
+    "all",
+]
 """
 
 source_directory = [
@@ -61,7 +70,7 @@ for name in source_directory:
                 f.write(" ".join(str(x) for x in features))
                 f.close()
 
-for name in source_directory:
+for name in source_search_directroy:
     directory = search_path + name
     for file in sorted(os.listdir(directory)):
         if file.endswith(".jpg"):

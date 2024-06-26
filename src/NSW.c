@@ -20,7 +20,6 @@ void InitalGraph(HNSW_Graph **G)
 Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b)
 {
     int level = RandomLevel();
-    printf("Data=%d Level=%d\n", data, level);
     Node *lastNode = NULL;       // 记录上一层的同节点，用于连接层与层
     if (level > G->highestLevel) // 每一层的第一个节点都作为入口点
     {
@@ -56,8 +55,8 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
     }
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
-    SL->candidatePointList = calloc(POINT_SUM, sizeof(Node *));                    // 候选节点数组 定长
-    SL->candidatePointList2 = calloc(POINT_SUM, sizeof(Node *));                   // 候选节点数组的影子数组 定长
+    SL->candidatePointList = calloc(NODESUM, sizeof(Node *));                      // 候选节点数组 定长
+    SL->candidatePointList2 = calloc(NODESUM, sizeof(Node *));                     // 候选节点数组的影子数组 定长
     SL->visitedPointList = calloc(1, sizeof(Node *));                              // 访问过节点数组 变长 当空间不足时长度加倍
     SL->visitedPointCount = 0;                                                     // 访问过节点数
     SL->candidatePointCount = 0;                                                   // 候选节点数
@@ -77,7 +76,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
             newNode->connectCount = 0;
             lastNode->nextLevel = newNode;
             // 第一个候选节点为上一层搜索到的最近节点，其余为NULL
-            for (int j = 1; j < POINT_SUM; j++)
+            for (int j = 1; j < NODESUM; j++)
             {
                 SL->candidatePointList[j] = NULL;
                 SL->candidatePointList2[j] = NULL;
@@ -191,11 +190,6 @@ void insertionSort(SearchList *SL, int n)
         }
         SL->candidatePointList[j + 1] = temp;
     }
-    for (int i = 0; i < n; i++)
-    {
-        printf("Data= %d Distance= %f\n", SL->candidatePointList[i]->data, SL->candidatePointList[i]->distance);
-    }
-    printf("\n");
 }
 
 // 将节点存入访问过节点数组
@@ -249,15 +243,15 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
     }
     for (int i = SL->candidatePointCount; i > mid; i--)
     {
-        // 若SL->candidatePointCount == POINT_SUM, 则越界
-        if (i == POINT_SUM)
+        // 若SL->candidatePointCount == NODESUM, 则越界
+        if (i == NODESUM)
         {
             continue;
         }
         SL->candidatePointList[i] = SL->candidatePointList[i - 1];
     }
     SL->candidatePointList[mid] = node;
-    if (SL->candidatePointCount < POINT_SUM)
+    if (SL->candidatePointCount < NODESUM)
     {
         SL->candidatePointCount++;
     }
@@ -274,12 +268,12 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath
 
     // 初始化搜索列表
     SearchList *SL = (SearchList *)malloc(sizeof(SearchList));
-    SL->candidatePointList = calloc(POINT_SUM, sizeof(Node *));  // 候选节点数组 定长
-    SL->candidatePointList2 = calloc(POINT_SUM, sizeof(Node *)); // 候选节点数组的影子数组 定长
-    SL->visitedPointList = calloc(1, sizeof(Node *));            // 访问过节点数组 变长 当空间不足时长度加倍
-    SL->visitedPointCount = 0;                                   // 访问过节点数
-    SL->candidatePointCount = 0;                                 // 候选节点数
-    SL->candidatePointList[SL->candidatePointCount++] = p;       // 第一个候选节点为入口点
+    SL->candidatePointList = calloc(NODESUM, sizeof(Node *));  // 候选节点数组 定长
+    SL->candidatePointList2 = calloc(NODESUM, sizeof(Node *)); // 候选节点数组的影子数组 定长
+    SL->visitedPointList = calloc(1, sizeof(Node *));          // 访问过节点数组 变长 当空间不足时长度加倍
+    SL->visitedPointCount = 0;                                 // 访问过节点数
+    SL->candidatePointCount = 0;                               // 候选节点数
+    SL->candidatePointList[SL->candidatePointCount++] = p;     // 第一个候选节点为入口点
 
     // 在每一层进行搜索，进入下一层时将上一层的最近节点作为新的入口
     for (int i = G->highestLevel; i >= 0; i--)
@@ -287,7 +281,7 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath
         if (i != G->highestLevel)
         {
             p = p->nextLevel;
-            for (int j = 0; j < POINT_SUM; j++)
+            for (int j = 0; j < NODESUM; j++)
             {
                 SL->candidatePointList[j] = NULL;
                 SL->candidatePointList2[j] = NULL;
@@ -300,11 +294,6 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath
         }
         FindNode(G, SearchNode, i, SL, filepath_a, filepath_b);
         p = SL->candidatePointList[0];
-        printf("level = %d\n", i);
-        for (int j = 0; j < SL->candidatePointCount; j++)
-        {
-            printf("candidatePointList[%d]=%d\n", j, SL->candidatePointList[j]->data);
-        }
         if (i == 0)
         {
             for (int j = 0; j < SEARCH_NUM && SEARCH_NUM <= SL->candidatePointCount; j++)
@@ -386,7 +375,7 @@ int findMinIndex(float *result)
 void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath_a, char *filepath_b)
 {
     Node temp;
-    for (int i = 0; i < DATASUM; i++)
+    for (int i = 0; i < NODESUM; i++)
     {
         temp.data = i;
         float distance = Distance(a, &temp, filepath_a, filepath_b);
@@ -400,7 +389,7 @@ void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath_a
     }
 }
 
-void ShowMenu(int choice)
+void ShowMenu(int choice, char *code)
 {
     switch (choice)
     {
@@ -435,10 +424,21 @@ void ShowMenu(int choice)
         // system("clear");
         printf("--------HNSW-SEARCH-OBJECT--------\n");
         printf("0. Return\n");
-        printf("1. Custom\n");
-        printf("2-%d: Given images from random selecting\n", SEARCH_OBJECT_NUM + 1);
+        printf("1. All\n");
+        printf("2. Aircraft\n");
+        printf("3. Clothing\n");
+        printf("4. Flower\n");
+        printf("5. food\n");
+        printf("6. Logo\n");
+        printf("7. Custom\n");
         printf("Please input your choice:");
         break;
+    }
+    case 3:
+    {
+        printf("\nFiles:\n");
+        system(code);
+        printf("Please input the index:");
     }
     }
 }

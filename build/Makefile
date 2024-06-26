@@ -117,24 +117,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named NSW
+# Target rules for targets named HNSW
 
 # Build rule for target.
-NSW: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 NSW
-.PHONY : NSW
+HNSW: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 HNSW
+.PHONY : HNSW
 
 # fast build rule for target.
-NSW/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/build
-.PHONY : NSW/fast
+HNSW/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/build
+.PHONY : HNSW/fast
 
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.o: home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.o
 .PHONY : home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.o
 
 # target to build an object file
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.o
 .PHONY : home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.o
 
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.i: home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.i
@@ -142,7 +142,7 @@ home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.i: home
 
 # target to preprocess a source file
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.i
 .PHONY : home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.i
 
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.s: home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.s
@@ -150,7 +150,7 @@ home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.s: home
 
 # target to generate assembly for a file
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.s
 .PHONY : home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.c.s
 
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.o: home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.o
@@ -158,7 +158,7 @@ home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.o: hom
 
 # target to build an object file
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.o
 .PHONY : home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.o
 
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.i: home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.i
@@ -166,7 +166,7 @@ home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.i: hom
 
 # target to preprocess a source file
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.i
 .PHONY : home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.i
 
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.s: home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.s
@@ -174,7 +174,7 @@ home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.s: hom
 
 # target to generate assembly for a file
 home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.s
 .PHONY : home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/main.c.s
 
 # Help Target
@@ -185,7 +185,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... NSW"
+	@echo "... HNSW"
 	@echo "... home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.o"
 	@echo "... home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.i"
 	@echo "... home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/src/NSW.s"

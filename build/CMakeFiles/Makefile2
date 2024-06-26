@@ -63,7 +63,7 @@ CMAKE_BINARY_DIR = /home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/NSW.dir/all
+all: CMakeFiles/HNSW.dir/all
 .PHONY : all
 
 # The main recursive "preinstall" target.
@@ -71,34 +71,34 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/NSW.dir/clean
+clean: CMakeFiles/HNSW.dir/clean
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/NSW.dir
+# Target rules for target CMakeFiles/HNSW.dir
 
 # All Build rule for target.
-CMakeFiles/NSW.dir/all:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/depend
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles --progress-num=1,2,3 "Built target NSW"
-.PHONY : CMakeFiles/NSW.dir/all
+CMakeFiles/HNSW.dir/all:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/depend
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles --progress-num=1,2,3 "Built target HNSW"
+.PHONY : CMakeFiles/HNSW.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/NSW.dir/rule: cmake_check_build_system
+CMakeFiles/HNSW.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles 3
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/NSW.dir/all
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/HNSW.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles 0
-.PHONY : CMakeFiles/NSW.dir/rule
+.PHONY : CMakeFiles/HNSW.dir/rule
 
 # Convenience name for target.
-NSW: CMakeFiles/NSW.dir/rule
-.PHONY : NSW
+HNSW: CMakeFiles/HNSW.dir/rule
+.PHONY : HNSW
 
 # clean rule for target.
-CMakeFiles/NSW.dir/clean:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/NSW.dir/build.make CMakeFiles/NSW.dir/clean
-.PHONY : CMakeFiles/NSW.dir/clean
+CMakeFiles/HNSW.dir/clean:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/HNSW.dir/build.make CMakeFiles/HNSW.dir/clean
+.PHONY : CMakeFiles/HNSW.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

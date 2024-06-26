@@ -1,3 +1,3 @@
-/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles/NSW.dir
+/home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles/HNSW.dir
 /home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles/edit_cache.dir
 /home/jiuhao/Workspace/2024-Spring/data_structure/Ex/projects/NSW/build/CMakeFiles/rebuild_cache.dir

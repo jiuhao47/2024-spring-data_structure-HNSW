@@ -2,4 +2,4 @@
 
 cmake .
 make
-./NSW
+./HNSW

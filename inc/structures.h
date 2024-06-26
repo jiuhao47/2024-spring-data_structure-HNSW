@@ -38,4 +38,4 @@ void ReadVectorFromFile(char *filename, float *vector, int size);
 float Distance(Node *a, Node *b, char *filepath_a, char *filepath_b);
 int findMinIndex(float *result);
 void BruteForceSearch(Node *a, float *result, int *resultIndex, char *filepath_a, char *filepath_b);
-void ShowMenu(int choice);
+void ShowMenu(int choice, char *code);
