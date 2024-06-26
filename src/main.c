@@ -52,10 +52,10 @@ int main()
                     for (int i = 0; i < nodeSum; i++)
                     {
                         InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath, nodeList);
-                        // progress = (float)i / nodeSum * 1000;
-                        // printf("\rBuilding Graph: %.2f%%", progress);
-                        // fflush(stdout);
-                        // printf("\033[K");
+                        progress = (float)i / nodeSum * 100;
+                        printf("\rBuilding Graph: %.2f%%", progress);
+                        fflush(stdout);
+                        printf("\033[K");
                     }
                     end_build = clock();
                     double build_time_spent = (double)(end_build - start_build) / CLOCKS_PER_SEC;
@@ -107,12 +107,12 @@ int main()
                     end_HNSW_search = clock();
                     double HNSW_search_time_spent = (double)(end_HNSW_search - start_HNSW_search) / CLOCKS_PER_SEC;
                     printf("%10f\n", HNSW_search_time_spent);
-                    /*
+
                     for (int i = 0; i < SEARCH_NUM; i++)
                     {
                         printf("ReturnList[%d]=%d Distance = %f\n", i, ReturnList[i]->data, ReturnList[i]->distance);
                     }
-                    */
+
                     Node *tempNode = (Node *)malloc(sizeof(Node));
 
                     tempNode->data = index;
@@ -142,11 +142,11 @@ int main()
                     double recall = (double)equal_count / SEARCH_NUM;
                     printf("%10f\n", recall);
 
-                    /*for (int i = 0; i < SEARCH_NUM; i++)
+                    for (int i = 0; i < SEARCH_NUM; i++)
                     {
                         printf("BruteForceSearch[%d]=%d %f\n", i, resultIndex[i], result[i]);
                     }
-                    */
+
                     // 搜索返回结果，然后处理结果（返回搜索图与m临近图到output文件夹）
                 }
             }

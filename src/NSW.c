@@ -175,19 +175,39 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
     }
     SL->candidatePointCount2 = SL->candidatePointCount;
     // 接下来一直循环，直到找到m-邻近节点
-    int count = 0;
+    // int count = 0;
     while (1)
     {
-        count++;
+        // count++;
+        /*
+        for (int i = 0; i < SL->candidatePointCount; i++)
+        {
+            printf("A: candidatePointList[%d]=%d\n", i, SL->candidatePointList[i]->data);
+        }
+        for (int i = 0; i < SL->candidatePointCount2 && SL->candidatePointList2[i] != NULL; i++)
+        {
+            printf("A: candidatePointList2[%d]=%d\n", i, SL->candidatePointList2[i]->data);
+        }
+        */
         // 从（影子的）第一个候选节点开始搜索m-邻近节点，并存入候选节点数组
-        for (int i = 0; i <= SL->candidatePointCount2 && SL->candidatePointList2[i] != NULL; i++)
+        for (int i = 0; i <= MAX_NEAR && SL->candidatePointList2[i] != NULL; i++)
         {
             for (int j = 0; j < SL->candidatePointList2[i]->connectCount && SL->candidatePointList2[i]->pList[j] != NULL; j++)
             {
-                InsertVisitedPointList(SL, SL->candidatePointList2[i]->pList[j]);
                 InsertCandidatePointList(SL, SL->candidatePointList2[i]->pList[j], newNode, filepath_a, filepath_b);
+                InsertVisitedPointList(SL, SL->candidatePointList2[i]->pList[j]);
             }
         }
+        /*
+        for (int i = 0; i < SL->candidatePointCount; i++)
+        {
+            printf("B: candidatePointList[%d]=%d\n", i, SL->candidatePointList[i]->data);
+        }
+        for (int i = 0; i < SL->candidatePointCount2 && SL->candidatePointList2[i] != NULL; i++)
+        {
+            printf("B: candidatePointList2[%d]=%d\n", i, SL->candidatePointList2[i]->data);
+        }
+        */
         // 判断候选节点数组和影子数组（至少）前MAX_NEAR项是否相同，若不相同则更新影子数组，若相同则找到m-邻近节点,进行连接
         // for (int i = 0; i < MAX_NEAR && SL->candidatePointList[i] != NULL; i++)
         // XXX: 列表动态判断相等循环条件存疑
@@ -195,7 +215,7 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
         {
             if (SL->candidatePointList[i] != SL->candidatePointList2[i])
             {
-                printf("Enter\n");
+                // printf("Enter\n");
                 for (int j = i; j < SL->candidatePointCount; j++)
                 {
                     SL->candidatePointList2[j] = SL->candidatePointList[j];
@@ -204,7 +224,7 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
             }
             if (i == MAX_NEAR - 1)
             {
-                printf("Count=%d\n", count);
+                // printf("Count=%d\n", count);
                 return;
             }
         }
@@ -267,7 +287,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
         {
             break;
         }
-        else if (SL->candidatePointList[mid]->distance < node->distance)
+        else if (SL->candidatePointList[mid]->distance > node->distance)
         {
             left = mid + 1;
         }
@@ -276,7 +296,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
             right = mid - 1;
         }
     }
-    for (int i = SL->candidatePointCount; i > mid; i--)
+    for (int i = SL->candidatePointCount; i > left; i--)
     {
         // 若SL->candidatePointCount == NODESUM, 则越界
         if (i == NODESUM)
@@ -285,7 +305,7 @@ void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *f
         }
         SL->candidatePointList[i] = SL->candidatePointList[i - 1];
     }
-    SL->candidatePointList[mid] = node;
+    SL->candidatePointList[left] = node;
     if (SL->candidatePointCount < NODESUM)
     {
         SL->candidatePointCount++;
