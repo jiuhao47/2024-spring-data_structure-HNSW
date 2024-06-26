@@ -15,9 +15,31 @@ void InitalGraph(HNSW_Graph **G)
     (*G)->pEntryPointList = (Node **)malloc(sizeof(Node *) * (MAX_LAYER + 1)); // 入口点数组
 }
 
-// 插入新节点
+void DeleteGraph(HNSW_Graph **G, Node *nodeList[])
+{   
+    Node *plast, *p;
+    // 释放每一个节点在每一层上的空间和连接
+    for (int i = 0; i < NODESUM; i++)
+    {
+        plast = nodeList[i];
+        while (plast->nextLevel != NULL)
+        {
+            p = plast->nextLevel;
+            free(plast->pList);
+            free(plast);
+            plast = p;
+        }
+        free(plast->pList);
+        free(plast);
+    }
+    // 释放入口点数组
+    free((*G)->pEntryPointList);
+    // 释放HNSW_Graph
+    free(*G);
+}
 
-Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b)
+// 插入新节点
+void InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b, Node *nodelist[])
 {
     int level = RandomLevel();
     Node *lastNode = NULL;       // 记录上一层的同节点，用于连接层与层
@@ -33,6 +55,7 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
                 newNode->pList = calloc(MAX_NEAR, sizeof(Node *)); // 分配m-邻近节点空间
                 newNode->connectCount = 0;                         // 连接数为0
                 G->pEntryPointList[level] = newNode;
+                nodelist[data] = newNode; // 保存节点
                 if (lastNode != NULL)
                 {
                     lastNode->nextLevel = newNode;
@@ -49,6 +72,10 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
     newNode->data = data;                              // 赋值
     newNode->pList = calloc(MAX_NEAR, sizeof(Node *)); // 分配m-邻近节点空间
     newNode->connectCount = 0;
+    if (nodelist[data] == NULL) // 保存节点
+    {
+        nodelist[data] = newNode;
+    }
     if (lastNode != NULL)
     {
         lastNode->nextLevel = newNode; // 连接数为0
@@ -113,6 +140,12 @@ Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filep
         lastNode = newNode;
     }
     G->nodeCount++;
+
+    //释放SL
+    free(SL->candidatePointList);
+    free(SL->candidatePointList2);
+    free(SL->visitedPointList);
+    free(SL);
 
     return newNode;
 }
@@ -302,11 +335,15 @@ Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath
             }
         }
     }
+    // 释放空间
+    free(SL->candidatePointList);
+    free(SL->candidatePointList2);
+    free(SL->visitedPointList);
+    free(SL);
     return result;
 }
 
 // 随机插入层数
-
 int RandomLevel()
 {
     double u = (double)rand() / RAND_MAX;

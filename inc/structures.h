@@ -25,7 +25,7 @@ typedef struct SearchList
     int candidatePointCount2;   // 候选节点数
 } SearchList;
 void InitalGraph(HNSW_Graph **G);
-Node *InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b);
+void InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b, Node *nodeList[]);
 void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *filepath_a, char *filepath_b);
 void insertionSort(SearchList *SL, int n);
 void InsertVisitedPointList(SearchList *SL, Node *node);

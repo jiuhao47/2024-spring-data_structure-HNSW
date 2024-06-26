@@ -9,6 +9,7 @@
 char dataset_filepath[FILEPATHLEN];
 char search_filepath[FILEPATHLEN];
 Node *nodeList[NODESUM];
+
 int main()
 {
     HNSW_Graph *HNSW_Graph_Instance;
@@ -48,7 +49,7 @@ int main()
                     int nodeSum = (dataset_choice == 1) ? 5 * NODESUM : NODESUM;
                     for (int i = 0; i < nodeSum; i++)
                     {
-                        nodeList[i] = InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath);
+                        InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath, nodeList);
                         progress = (float)i / nodeSum * 100;
                         // printf("\rBuilding Graph: %.2f%%", progress);
                         // fflush(stdout);
