@@ -26,14 +26,13 @@ fi
 cmake .
 make
 
-input="1 "$inputDataSet" 2 "$inputDataSet
-for((search_index=1;search_index<11;search_index++))
+input="1 "$inputDataSet" 2 "$inputDataSet" 1 "
+for((search_index=2;search_index<11;search_index++))
 do
-    input=$input" "$search_index
+    input=$input" 2 "$inputDataSet" "$search_index
 done
-echo $input 
-
-#echo $input | ./HNSW
-
+input=$input" 0"
+echo $input | ./HNSW
+# 1 4 2 4 1 2 2 2 3 2 4 2 5 2 6 2 7 2 8 2 9 2 10 0
 # build graph : 1 -> inputDataSet
 # search graph : 2 -> inputDataSet -> 1...10

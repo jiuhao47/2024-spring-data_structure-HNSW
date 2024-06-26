@@ -31,7 +31,7 @@ void insertionSort(SearchList *SL, int n);
 void InsertVisitedPointList(SearchList *SL, Node *node);
 void InsertCandidatePointList(SearchList *SL, Node *node, Node *newNode, char *filepath_a, char *filepath_b);
 Node **Search(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepath_b);
-
+void DeleteGraph(HNSW_Graph **G, Node *nodeList[]);
 int RandomLevel();
 float CosineDistance(float *a, float *b, int size);
 void ReadVectorFromFile(char *filename, float *vector, int size);

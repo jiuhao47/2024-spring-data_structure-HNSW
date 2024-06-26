@@ -3,6 +3,7 @@
 #include <math.h>
 #include <dirent.h>
 #include <sys/types.h>
+
 #include "../inc/definition.h"
 #include "../inc/structures.h"
 
@@ -22,15 +23,14 @@ void DeleteGraph(HNSW_Graph **G, Node *nodeList[])
     for (int i = 0; i < NODESUM; i++)
     {
         plast = nodeList[i];
-        while (plast->nextLevel != NULL)
+        // free
+        while (plast != NULL)
         {
             p = plast->nextLevel;
             free(plast->pList);
             free(plast);
             plast = p;
         }
-        free(plast->pList);
-        free(plast);
     }
     // 释放入口点数组
     free((*G)->pEntryPointList);
@@ -146,8 +146,6 @@ void InsertNode(HNSW_Graph *G, NodeDataType data, char *filepath_a, char *filepa
     free(SL->candidatePointList2);
     free(SL->visitedPointList);
     free(SL);
-
-    return newNode;
 }
 
 // 连接新节点与第level层的m-邻近节点
@@ -177,8 +175,10 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
     }
     SL->candidatePointCount2 = SL->candidatePointCount;
     // 接下来一直循环，直到找到m-邻近节点
+    int count = 0;
     while (1)
     {
+        count++;
         // 从（影子的）第一个候选节点开始搜索m-邻近节点，并存入候选节点数组
         for (int i = 0; i <= SL->candidatePointCount2 && SL->candidatePointList2[i] != NULL; i++)
         {
@@ -195,6 +195,7 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
         {
             if (SL->candidatePointList[i] != SL->candidatePointList2[i])
             {
+                printf("Enter\n");
                 for (int j = i; j < SL->candidatePointCount; j++)
                 {
                     SL->candidatePointList2[j] = SL->candidatePointList[j];
@@ -203,6 +204,7 @@ void FindNode(HNSW_Graph *G, Node *newNode, int level, SearchList *SL, char *fil
             }
             if (i == MAX_NEAR - 1)
             {
+                printf("Count=%d\n", count);
                 return;
             }
         }
