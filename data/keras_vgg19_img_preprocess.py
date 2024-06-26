@@ -3,10 +3,8 @@ from keras._tf_keras.keras.preprocessing import image
 from keras._tf_keras.keras.applications.vgg19 import VGG19, preprocess_input
 import numpy as np
 import os
-from random_example import list_all_files
 import shutil
 
-"""
 source_directory = [
     "flower",
     "logo",
@@ -16,14 +14,22 @@ source_directory = [
     "custom",
 ]
 """
+
 source_directory = [
     "custom",
 ]
+"""
 
 file_path = "./imgInput/"
 search_path = "./imgInput/search/"
 # 加载预训练的VGG19模型，不包括顶部的全连接层
 model = VGG19(weights="imagenet", include_top=False)
+
+
+def list_all_files(directory):
+    for dirpath, dirnames, filenames in os.walk(directory):
+        for filename in filenames:
+            yield os.path.join(dirpath, filename)
 
 
 def extract_features(img_path):
@@ -67,6 +73,7 @@ for name in source_directory:
             with open("./preprocess/search/" + name + "/" + index + ".txt", "w") as f:
                 f.write(" ".join(str(x) for x in features))
                 f.close()
+print("Done")
 all_directory = file_path + "all/"
 j = 0
 for name in source_directory:
@@ -75,5 +82,5 @@ for name in source_directory:
     for i, file in enumerate(all_files):
         new_file_name = all_directory + str(j) + ".txt"
         j = j + 1
-        print(new_file_name)
+        # print(new_file_name)
         shutil.copy(file, new_file_name)
