@@ -52,15 +52,14 @@ int main()
                     for (int i = 0; i < nodeSum; i++)
                     {
                         InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath, nodeList);
-                        progress = (float)i / nodeSum * 100;
-                        printf("\rBuilding Graph: %.2f%%", progress);
-                        fflush(stdout);
-                        printf("\033[K");
+                        // progress = (float)i / nodeSum * 100;
+                        // printf("\rBuilding Graph: %.2f%%", progress);
+                        // fflush(stdout);
+                        // printf("\033[K");
                     }
                     end_build = clock();
                     double build_time_spent = (double)(end_build - start_build) / CLOCKS_PER_SEC;
-                    printf("%10f\n", build_time_spent);
-                    printf("\n");
+                    printf("%10f\n\n", build_time_spent);
                     // printf("\nGraph Build Finish!\n");
                 }
                 else
@@ -105,13 +104,6 @@ int main()
                     start_HNSW_search = clock();
                     ReturnList = Search(HNSW_Graph_Instance, index, search_filepath, dataset_filepath);
                     end_HNSW_search = clock();
-                    double HNSW_search_time_spent = (double)(end_HNSW_search - start_HNSW_search) / CLOCKS_PER_SEC;
-                    printf("%10f\n", HNSW_search_time_spent);
-
-                    for (int i = 0; i < SEARCH_NUM; i++)
-                    {
-                        printf("ReturnList[%d]=%d Distance = %f\n", i, ReturnList[i]->data, ReturnList[i]->distance);
-                    }
 
                     Node *tempNode = (Node *)malloc(sizeof(Node));
 
@@ -126,8 +118,23 @@ int main()
                     start_BruteForce_search = clock();
                     BruteForceSearch(tempNode, result, resultIndex, search_filepath, dataset_filepath);
                     end_BruteForce_ = clock();
-                    double BruteForce_search_time_spent = (double)(end_BruteForce_ - start_BruteForce_search) / CLOCKS_PER_SEC;
-                    printf("%10f\n", BruteForce_search_time_spent);
+
+                    // 对result降序排序，并对resultIndex做同样的移动（插入排序）
+                    for (int i = 1; i < SEARCH_NUM; i++)
+                    {
+                        float temp = result[i];
+                        int tempIndex = resultIndex[i];
+                        int j = i - 1;
+                        while (j >= 0 && result[j] < temp)
+                        {
+                            result[j + 1] = result[j];
+                            resultIndex[j + 1] = resultIndex[j];
+                            j--;
+                        }
+                        result[j + 1] = temp;
+                        resultIndex[j + 1] = tempIndex;
+                    }
+
                     int equal_count = 0;
                     for (int i = 0; i < SEARCH_NUM; i++)
                     {
@@ -139,13 +146,21 @@ int main()
                             }
                         }
                     }
+                    double HNSW_search_time_spent = (double)(end_HNSW_search - start_HNSW_search) / CLOCKS_PER_SEC;
+                    double BruteForce_search_time_spent = (double)(end_BruteForce_ - start_BruteForce_search) / CLOCKS_PER_SEC;
                     double recall = (double)equal_count / SEARCH_NUM;
-                    printf("%10f\n", recall);
-
+                    printf("%10f\n", HNSW_search_time_spent);
+                    printf("%10f\n", BruteForce_search_time_spent);
+                    printf("%10f\n\n", recall);
                     for (int i = 0; i < SEARCH_NUM; i++)
                     {
-                        printf("BruteForceSearch[%d]=%d %f\n", i, resultIndex[i], result[i]);
+                        printf("%10f\n", ReturnList[i]->distance);
                     }
+                    for (int i = 0; i < SEARCH_NUM; i++)
+                    {
+                        printf("%10f\n", result[i]);
+                    }
+                    printf("\n");
 
                     // 搜索返回结果，然后处理结果（返回搜索图与m临近图到output文件夹）
                 }

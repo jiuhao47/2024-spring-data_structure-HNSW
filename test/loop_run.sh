@@ -26,29 +26,33 @@ fi
 cmake .
 make
 
-input="1 "$inputDataSet" 2 "$inputDataSet" 1 "
-for((search_index=2;search_index<11;search_index++))
-do
-    input=$input" 2 "$inputDataSet" "$search_index
-done
-input=$input" 0"
-
-echo $input | ./HNSW
-# for((round=0;round<3;round++))
+# input="1 "$inputDataSet" 2 "$inputDataSet" 1 "
+# for((search_index=2;search_index<11;search_index++))
 # do
-#     python3 ../data/random_example.py
-#     python3 ../data/keras_vgg19_img_preprocess.py
-#     for((inputDataSet=1;inputDataSet<8;inputDataSet++))
-#     do
-#         input="1 "$inputDataSet" 2 "$inputDataSet" 1 "
-#         for((search_index=2;search_index<11;search_index++))
-#         do
-#             input=$input" 2 "$inputDataSet" "$search_index
-#         done
-#         input=$input" 0"
-#         echo $input | ./HNSW > ../output/output_$inputDataSet"_"$search_index"_"$round".txt"
-#     done
+#     input=$input" 2 "$inputDataSet" "$search_index
 # done
+# input=$input" 0"
+
+# echo $input | ./HNSW
+for((round=0;round<5;round++))
+do
+    cd ..
+    cd data
+    python3 random_example.py
+    python3 keras_vgg19_img_preprocess.py
+    cd ..
+    cd build
+    for((inputDataSet=2;inputDataSet<7;inputDataSet++))
+    do
+        input="1 "$inputDataSet" 2 "$inputDataSet" 1 "
+        for((search_index=2;search_index<11;search_index++))
+        do
+            input=$input" 2 "$inputDataSet" "$search_index
+        done
+        input=$input" 0"
+        echo $input | ./HNSW > ../data/output/output_$inputDataSet"_"$search_index"_"$round".txt"
+    done
+done
 # 1 4 2 4 1 2 2 2 3 2 4 2 5 2 6 2 7 2 8 2 9 2 10 0
 # build graph : 1 -> inputDataSet
 # search graph : 2 -> inputDataSet -> 1...10
