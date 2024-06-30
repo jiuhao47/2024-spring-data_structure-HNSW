@@ -14,5 +14,7 @@
 //DONE: 与暴力搜索对比
 //DONE: 命令行前端Ver（//TODO: 支持单独导入图片）
 //DONE: 调试Ver
-//TODO: 批处理
+//DONE: 批处理脚本
+//TODO: m=3,5,10,15,20
+//TODO: all
 //TODO: 实验报告Doc

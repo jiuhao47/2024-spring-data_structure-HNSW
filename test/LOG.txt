@@ -1,0 +1,23 @@
+[LOG]: Script Start!
+[LOG]: Random example done!
+[LOG]: Image to txt Done!
+[LOG]: _0 Done!
+[LOG]: _0 Done!
+[LOG]: _0 Done!
+[LOG]: _0 Done!
+[LOG]: _0 Done!
+[LOG]: Random example done!
+[LOG]: Image to txt Done!
+[LOG]: _1 Done!
+[LOG]: _1 Done!
+[LOG]: _1 Done!
+[LOG]: _1 Done!
+[LOG]: _1 Done!
+[LOG]: Random example done!
+[LOG]: Image to txt Done!
+[LOG]: _2 Done!
+[LOG]: _2 Done!
+[LOG]: _2 Done!
+[LOG]: _2 Done!
+[LOG]: _2 Done!
+[LOG]: All Done!

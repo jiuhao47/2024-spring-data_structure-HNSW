@@ -19,7 +19,7 @@ int main()
     int main_choice = 1;
     while ((main_choice != 0))
     {
-        // ShowMenu(0, NULL);
+        ShowMenu(0, NULL);
         scanf("%d", &main_choice);
         switch (main_choice)
         {
@@ -27,7 +27,7 @@ int main()
             break;
         case 1:
         {
-            // ShowMenu(1,NULL);
+            ShowMenu(1, NULL);
             int dataset_choice;
             scanf("%d", &dataset_choice);
             if (dataset_choice == 0)
@@ -52,15 +52,15 @@ int main()
                     for (int i = 0; i < nodeSum; i++)
                     {
                         InsertNode(HNSW_Graph_Instance, i, dataset_filepath, dataset_filepath, nodeList);
-                        // progress = (float)i / nodeSum * 100;
-                        // printf("\rBuilding Graph: %.2f%%", progress);
-                        // fflush(stdout);
-                        // printf("\033[K");
+                        progress = (float)i / nodeSum * 100;
+                        printf("\rBuilding Graph: %.2f%%", progress);
+                        fflush(stdout);
+                        printf("\033[K");
                     }
                     end_build = clock();
                     double build_time_spent = (double)(end_build - start_build) / CLOCKS_PER_SEC;
                     printf("%10f\n\n", build_time_spent);
-                    // printf("\nGraph Build Finish!\n");
+                    printf("\nGraph Build Finish!\n");
                 }
                 else
                 {
@@ -72,7 +72,7 @@ int main()
         break;
         case 2:
         {
-            // ShowMenu(2,NULL);
+            ShowMenu(2, NULL);
             int search_choice;
             scanf("%d", &search_choice);
             if (search_choice == 0)
@@ -96,7 +96,7 @@ int main()
                     snprintf(search_filepath, FILEPATHLEN, "%s%s%s", "../data/preprocess/search/", datasets[search_choice - 1], "/%d.txt");
                     char ls_code[100];
                     snprintf(ls_code, 100, "%s%s", "ls ../data/preprocess/search/", datasets[search_choice - 1]);
-                    // ShowMenu(3, ls_code);
+                    ShowMenu(3, ls_code);
                     int index;
                     scanf("%d", &index);
                     Node **ReturnList = (Node **)malloc(sizeof(Node *) * SEARCH_NUM);
